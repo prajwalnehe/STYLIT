@@ -2,6 +2,7 @@ import React from 'react';
 import Collections from '../components/Collections';
 import MobileBottomNav from '../components/MobileBottomNav';
 import HeroSlider from '../components/HeroSlider';
+import ShopByGender from '../components/ShopByGender';
 
 const Home = () => {
   return (
@@ -20,6 +21,9 @@ const Home = () => {
         ]}
         mobileSrc="https://res.cloudinary.com/duc9svg7w/image/upload/v1762318223/Beige_And_Brown_Luxury_Shopping_Guide_Instagram_Post_20251104_225913_0000_tbyvtj.png"
       />
+
+      {/* Shop By Gender */}
+      <ShopByGender />
 
       {/* Featured Collections */}
       <Collections />
