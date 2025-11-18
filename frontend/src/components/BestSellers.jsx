@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaRupeeSign, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaRupeeSign, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { fetchSarees } from '../services/api';
 
 const BestSellers = () => {
@@ -8,6 +8,8 @@ const BestSellers = () => {
   const [wishlist, setWishlist] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const scrollContainerRef = useRef(null);
   const scrollIntervalRef = useRef(null);
   const navigate = useNavigate();
@@ -53,6 +55,26 @@ const BestSellers = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  const checkScrollButtons = () => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    const currentScroll = scrollContainer.scrollLeft;
+
+    setCanScrollLeft(currentScroll > 0);
+    setCanScrollRight(currentScroll < maxScroll - 1);
+  };
+
+  // Check scroll buttons on mount and when products change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkScrollButtons();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [products, isMobile]);
 
   // Auto-scroll for mobile and desktop
   useEffect(() => {
@@ -153,6 +175,46 @@ const BestSellers = () => {
     navigate(`/product/${product._id}`);
   };
 
+  const scrollLeft = () => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const flexContainer = scrollContainer.querySelector('.flex');
+    if (!flexContainer) return;
+
+    const firstCard = flexContainer.querySelector('div');
+    if (!firstCard) return;
+
+    const cardWidth = firstCard.offsetWidth;
+    const gap = 24;
+    const cardsToScroll = isMobile ? 1 : 4;
+    const scrollAmount = (cardWidth + gap) * cardsToScroll;
+
+    scrollContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 3000);
+  };
+
+  const scrollRight = () => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const flexContainer = scrollContainer.querySelector('.flex');
+    if (!flexContainer) return;
+
+    const firstCard = flexContainer.querySelector('div');
+    if (!firstCard) return;
+
+    const cardWidth = firstCard.offsetWidth;
+    const gap = 24;
+    const cardsToScroll = isMobile ? 1 : 4;
+    const scrollAmount = (cardWidth + gap) * cardsToScroll;
+
+    scrollContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 3000);
+  };
+
   if (products.length === 0) {
     return null;
   }
@@ -171,29 +233,56 @@ const BestSellers = () => {
         </div>
 
         {/* Product Cards - Horizontal Scroll */}
-        <div 
-          ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide -mx-4 px-4"
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => {
-            setTimeout(() => setIsPaused(false), 3000);
-          }}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onScroll={() => {
-            setIsPaused(true);
-            // Clear existing timeout
-            if (scrollIntervalRef.current?.pauseTimeout) {
-              clearTimeout(scrollIntervalRef.current.pauseTimeout);
-            }
-            // Resume after 3 seconds of no scrolling
-            scrollIntervalRef.current = scrollIntervalRef.current || {};
-            scrollIntervalRef.current.pauseTimeout = setTimeout(() => {
-              setIsPaused(false);
-            }, 3000);
-          }}
-        >
-          <div className="flex gap-6" style={{ scrollBehavior: 'smooth' }}>
+        <div className="relative -mx-4 px-4">
+          {/* Left Arrow */}
+          {canScrollLeft && (
+            <button
+              onClick={scrollLeft}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full shadow-lg p-2 md:p-3 hover:bg-gray-50 transition-all opacity-90 hover:opacity-100"
+              aria-label="Scroll left"
+            >
+              <FaChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+            </button>
+          )}
+
+          {/* Right Arrow */}
+          {canScrollRight && (
+            <button
+              onClick={scrollRight}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full shadow-lg p-2 md:p-3 hover:bg-gray-50 transition-all opacity-90 hover:opacity-100"
+              aria-label="Scroll right"
+            >
+              <FaChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+            </button>
+          )}
+
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-x-auto scrollbar-hide"
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => {
+              setTimeout(() => {
+                setIsPaused(false);
+                checkScrollButtons();
+              }, 3000);
+            }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onScroll={() => {
+              setIsPaused(true);
+              checkScrollButtons();
+              // Clear existing timeout
+              if (scrollIntervalRef.current?.pauseTimeout) {
+                clearTimeout(scrollIntervalRef.current.pauseTimeout);
+              }
+              // Resume after 3 seconds of no scrolling
+              scrollIntervalRef.current = scrollIntervalRef.current || {};
+              scrollIntervalRef.current.pauseTimeout = setTimeout(() => {
+                setIsPaused(false);
+              }, 3000);
+            }}
+          >
+            <div className="flex gap-6" style={{ scrollBehavior: 'smooth' }}>
             {products.map((product) => {
               const price = calculatePrice(product);
               const mrp = product.mrp || 0;
@@ -269,6 +358,7 @@ const BestSellers = () => {
               </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
