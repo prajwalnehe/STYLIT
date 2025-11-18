@@ -50,13 +50,17 @@ export default function ShopByGender() {
   };
 
   return (
-    <section className="w-full min-h-screen overflow-hidden">
+    <section className="hidden md:block w-full min-h-screen overflow-hidden">
       <div
         className="w-full flex flex-col items-center justify-center bg-white"
         style={{ height: HEADER_HEIGHT_PX }}
       >
-        <h2 className="text-3xl font-semibold text-gray-800">Shop by Gender</h2>
-        <p className="text-sm text-gray-500 italic">Styled for All</p>
+        <h2 className="text-5xl md:text-6xl font-serif text-gray-800 mb-3 tracking-wide" style={{ fontFamily: 'serif' }}>
+          Shop by Gender
+        </h2>
+        <p className="text-base md:text-lg text-gray-600 font-light italic">
+          Styled for All
+        </p>
       </div>
 
       <div

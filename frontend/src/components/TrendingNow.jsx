@@ -1,32 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaRupeeSign, FaHeart, FaRegHeart } from 'react-icons/fa';
 import { fetchSarees } from '../services/api';
 
-const BestSellers = () => {
+const TrendingNow = () => {
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const scrollContainerRef = useRef(null);
-  const scrollIntervalRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const data = await fetchSarees('');
-        // Filter products with discounts first, then regular products
-        const productsWithDiscount = data
-          .filter(p => (p.discountPercent > 0 || p.discount > 0) && p.images?.image1);
+        // Filter products with images and show all products
+        const availableProducts = data
+          .filter(p => p.images?.image1);
         
-        const regularProducts = data
-          .filter(p => p.images?.image1 && !productsWithDiscount.find(prod => prod._id === p._id));
-        
-        // Combine: discount products first, then regular products
-        setProducts([...productsWithDiscount, ...regularProducts]);
+        setProducts(availableProducts);
       } catch (error) {
-        console.error('Error loading best sellers:', error);
+        console.error('Error loading trending products:', error);
       }
     };
 
@@ -42,76 +34,6 @@ const BestSellers = () => {
       console.error('Error loading wishlist:', e);
     }
   }, []);
-
-  // Check if mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768); // md breakpoint
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Auto-scroll for mobile and desktop
-  useEffect(() => {
-    if (products.length === 0 || isPaused) {
-      if (scrollIntervalRef.current) {
-        clearInterval(scrollIntervalRef.current);
-        scrollIntervalRef.current = null;
-      }
-      return;
-    }
-
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-
-    // Wait for DOM to be ready and calculate card width
-    const startAutoScroll = () => {
-      const flexContainer = scrollContainer.querySelector('.flex');
-      if (!flexContainer) return;
-
-      const firstCard = flexContainer.querySelector('div');
-      if (!firstCard) return;
-
-      const cardWidth = firstCard.offsetWidth;
-      const gap = 24; // gap-6 = 1.5rem = 24px
-      // Mobile: scroll 1 card at a time (showing 2 cards), Desktop: scroll 4 cards at a time (showing 4 cards)
-      const cardsToScroll = isMobile ? 1 : 4;
-      const scrollAmount = (cardWidth + gap) * cardsToScroll;
-
-      if (scrollIntervalRef.current) {
-        clearInterval(scrollIntervalRef.current);
-      }
-
-      scrollIntervalRef.current = setInterval(() => {
-        if (scrollContainer && !isPaused) {
-          const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-          const currentScroll = scrollContainer.scrollLeft;
-
-          if (currentScroll >= maxScroll - 1) {
-            // Loop back to start
-            scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            // Scroll cards
-            scrollContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-          }
-        }
-      }, 3000); // Scroll every 3 seconds
-    };
-
-    // Small delay to ensure DOM is ready
-    const timeoutId = setTimeout(startAutoScroll, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (scrollIntervalRef.current) {
-        clearInterval(scrollIntervalRef.current);
-        scrollIntervalRef.current = null;
-      }
-    };
-  }, [isMobile, products, isPaused]);
 
   const toggleWishlist = (productId, e) => {
     e.stopPropagation();
@@ -158,54 +80,32 @@ const BestSellers = () => {
   }
 
   return (
-    <section className="py-16 px-4 bg-gray-50">
+    <section className="py-16 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-5xl md:text-6xl font-serif text-gray-800 mb-3 tracking-wide" style={{ fontFamily: 'serif' }}>
-            Best-sellers
+            Trending Now
           </h2>
-          <p className="text-base md:text-lg text-gray-600 font-light">
-            Styled for All!
+          <p className="text-base md:text-lg text-gray-600 font-light italic">
+            Serving looks, garma-garam!
           </p>
         </div>
 
-        {/* Product Cards - Horizontal Scroll */}
-        <div 
-          ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide -mx-4 px-4"
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => {
-            setTimeout(() => setIsPaused(false), 3000);
-          }}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onScroll={() => {
-            setIsPaused(true);
-            // Clear existing timeout
-            if (scrollIntervalRef.current?.pauseTimeout) {
-              clearTimeout(scrollIntervalRef.current.pauseTimeout);
-            }
-            // Resume after 3 seconds of no scrolling
-            scrollIntervalRef.current = scrollIntervalRef.current || {};
-            scrollIntervalRef.current.pauseTimeout = setTimeout(() => {
-              setIsPaused(false);
-            }, 3000);
-          }}
-        >
-          <div className="flex gap-6" style={{ scrollBehavior: 'smooth' }}>
-            {products.map((product) => {
-              const price = calculatePrice(product);
-              const mrp = product.mrp || 0;
-              const discount = calculateDiscount(product);
-              const isWishlisted = wishlist.includes(product._id);
+        {/* Product Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((product) => {
+            const price = calculatePrice(product);
+            const mrp = product.mrp || 0;
+            const discount = calculateDiscount(product);
+            const isWishlisted = wishlist.includes(product._id);
 
-              return (
-                <div
-                  key={product._id}
-                  className="flex-shrink-0 group bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 w-[calc(50vw-28px)] md:w-[calc(25%-18px)] min-w-[calc(50vw-28px)] md:min-w-[calc(25%-18px)]"
-                  onClick={() => handleProductClick(product)}
-                >
+            return (
+              <div
+                key={product._id}
+                className="group bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100"
+                onClick={() => handleProductClick(product)}
+              >
                 {/* Image Container */}
                 <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
                   <img
@@ -267,14 +167,13 @@ const BestSellers = () => {
                   </div>
                 </div>
               </div>
-              );
-            })}
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 };
 
-export default BestSellers;
+export default TrendingNow;
 

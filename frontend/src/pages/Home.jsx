@@ -1,9 +1,9 @@
 import React from 'react';
-import Collections from '../components/Collections';
 import MobileBottomNav from '../components/MobileBottomNav';
 import HeroSlider from '../components/HeroSlider';
 import ShopByGender from '../components/ShopByGender';
 import BestSellers from '../components/BestSellers';
+import TrendingNow from '../components/TrendingNow';
 
 const Home = () => {
   return (
@@ -29,8 +29,8 @@ const Home = () => {
       {/* Shop By Gender */}
       <ShopByGender />
 
-      {/* Featured Collections */}
-      <Collections />
+      {/* Trending Now */}
+      <TrendingNow />
 
       {/* Why Choose Us */}
 <section className="py-20 px-4 bg-white">
