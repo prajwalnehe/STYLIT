@@ -44,17 +44,20 @@ const AdminDashboard = () => {
     return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{status}</span>;
   };
 
-  const StatCard = ({ icon: Icon, label, value, gradient }) => (
-    <div className={`rounded-xl p-5 shadow-sm border bg-gradient-to-b ${gradient}`}>
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-lg bg-white/70 text-gray-700 flex items-center justify-center">
-          <Icon className="h-5 w-5" />
+  const StatCard = ({ icon: Icon, label, value, gradient }) => {
+    const hideIconOnMobile = label === 'Total Revenue';
+    return (
+      <div className={`rounded-xl p-4 sm:p-5 shadow-sm border bg-gradient-to-b ${gradient}`}>
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className={`${hideIconOnMobile ? 'hidden sm:flex' : 'flex'} h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-white/70 text-gray-700 items-center justify-center flex-shrink-0`}>
+            <Icon className="h-5 w-5" />
+          </div>
+          <div className="ml-auto flex-1 text-right font-bold text-base sm:text-2xl md:text-3xl leading-tight break-words">{value}</div>
         </div>
-        <div className="ml-auto text-2xl font-bold">{value}</div>
+        <div className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-700 font-medium">{label}</div>
       </div>
-      <div className="mt-3 text-sm text-gray-700 font-medium">{label}</div>
-    </div>
-  );
+    );
+  };
 
   const activity = recentOrders.map(o => ({
     id: o._id,
@@ -81,7 +84,7 @@ const AdminDashboard = () => {
         <div className="p-4 text-red-600">{error}</div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
             <StatCard icon={FiCreditCard} label="Total Revenue" value={formatINR(stats.totalRevenue)} gradient="from-amber-50 to-amber-100" />
             <StatCard icon={FiShoppingBag} label="Total Orders" value={stats.totalOrders} gradient="from-rose-50 to-rose-100" />
             <StatCard icon={FiBox} label="Total Products" value={stats.totalProducts} gradient="from-amber-50 to-amber-100" />
