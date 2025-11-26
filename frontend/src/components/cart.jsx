@@ -60,7 +60,7 @@ function Cart() {
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Your cart is empty</h2>
           <p className="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
           <button 
-            onClick={() => navigate('/collections')}
+            onClick={() => navigate('/')}
             className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors cursor-pointer"
           >
             Continue Shopping
@@ -69,7 +69,7 @@ function Cart() {
       ) : (
         <div className="px-4 py-4 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Product Listings - Left Side */}
+            {/* Product Listings - Left Side */}  
             <div className="lg:col-span-2 space-y-4">
               {cart.map((item) => (
                 <div key={item.id} className="bg-white rounded-lg shadow-sm p-4">

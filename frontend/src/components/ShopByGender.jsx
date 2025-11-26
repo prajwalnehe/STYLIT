@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 export default function ShopByGender() {
-  const HEADER_HEIGHT_PX = 120;
+  const HEADER_HEIGHT_PX_DESKTOP = 120;
+  const HEADER_HEIGHT_PX_MOBILE = 100;
 
   // Desktop Images
   const desktopImages = [
@@ -28,8 +29,10 @@ export default function ShopByGender() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  const headerHeight = isMobile ? HEADER_HEIGHT_PX_MOBILE : HEADER_HEIGHT_PX_DESKTOP;
   const gridWrapperStyle = {
-    height: `calc(100vh - ${HEADER_HEIGHT_PX}px)`,
+    height: `calc(100vh - ${headerHeight}px)`,
+    minHeight: isMobile ? '400px' : 'auto',
   };
 
   const imagesToUse = isMobile ? mobileImages : desktopImages;
@@ -39,20 +42,28 @@ export default function ShopByGender() {
 
       {/* Header */}
       <div
-        className="w-full flex flex-col items-center justify-center bg-white"
-        style={{ height: HEADER_HEIGHT_PX }}
+        className={`w-full flex flex-col items-center justify-center bg-white ${
+          isMobile ? 'px-4 py-4' : 'py-6'
+        }`}
+        style={{ height: headerHeight, minHeight: headerHeight }}
       >
-        <h2 className="text-5xl md:text-6xl font-serif text-gray-800 mb-3 tracking-wide">
+        <h2 className={`font-serif text-gray-800 mb-2 tracking-wide ${
+          isMobile ? 'text-3xl' : 'text-5xl md:text-6xl mb-3'
+        }`}>
           Shop by Gender
         </h2>
-        <p className="text-base md:text-lg text-gray-600 font-light italic">
+        <p className={`text-gray-600 font-light italic ${
+          isMobile ? 'text-sm' : 'text-base md:text-lg'
+        }`}>
           Styled for All
         </p>
       </div>
 
       {/* 2×2 Grid for both Desktop & Mobile */}
       <div
-        className="grid grid-cols-2 grid-rows-2 gap-0 w-full h-full"
+        className={`grid grid-cols-2 grid-rows-2 w-full h-full ${
+          isMobile ? 'gap-1' : 'gap-0'
+        }`}
         style={gridWrapperStyle}
       >
         {imagesToUse.map((image, idx) => (

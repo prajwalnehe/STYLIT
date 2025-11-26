@@ -1,6 +1,7 @@
 import React from 'react';
 import MobileBottomNav from '../components/MobileBottomNav';
 import HeroSlider from '../components/HeroSlider';
+import ShopByCategory from '../components/ShopByCategory';
 import ShopByGender from '../components/ShopByGender';
 import BestSellers from '../components/BestSellers';
 import TrendingNow from '../components/TrendingNow';
@@ -22,6 +23,9 @@ const Home = () => {
         ]}
         mobileSrc="https://res.cloudinary.com/duc9svg7w/image/upload/v1763383307/file_0000000032ac7209890b93ba8217ac10_1_nfz2u2.png"
       />
+
+      {/* Shop by Category */}
+      <ShopByCategory />
 
       {/* Best Sellers */}
       <BestSellers />

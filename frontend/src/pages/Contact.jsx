@@ -31,13 +31,13 @@ const Contact = () => {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Email</h3>
                 <p className="text-gray-700">
-                  <a href="mailto:info@sareesansar.com" className="hover:text-amber-600 transition-colors">
-                    info@sareesansar.com
+                  <a href="mailto:info@paridhaan.com" className="hover:text-amber-600 transition-colors">
+                    info@paridhaan.com
                   </a>
                 </p>
                 <p className="text-gray-700">
-                  <a href="mailto:support@sareesansar.com" className="hover:text-amber-600 transition-colors">
-                    support@sareesansar.com
+                  <a href="mailto:support@paridhaan.com" className="hover:text-amber-600 transition-colors">
+                    support@paridhaan.com
                   </a>
                 </p>
               </div>

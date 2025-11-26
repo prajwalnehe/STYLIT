@@ -275,7 +275,8 @@ const Navbar = () => {
                   key={link.name}
                   to={link.path}
                   onClick={scrollToTop}
-                  className="text-gray-700 hover:text-gray-800 font-medium transition-colors duration-200 text-sm whitespace-nowrap px-2"
+                  className="text-gray-700 hover:text-gray-800 font-serif font-bold transition-colors duration-200 text-sm whitespace-nowrap px-2"
+                  style={{ fontFamily: 'serif' }}
                 >
                   {link.name}
                 </Link>
@@ -384,7 +385,8 @@ const Navbar = () => {
                   key={link.name}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-center text-gray-700 hover:text-gray-800 hover:bg-rose-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-sm sm:text-base border border-gray-200"
+                  className="flex items-center justify-center text-gray-700 hover:text-gray-800 hover:bg-rose-50 font-serif font-bold py-3 px-4 rounded-lg transition-all duration-200 text-sm sm:text-base border border-gray-200"
+                  style={{ fontFamily: 'serif' }}
                 >
                   {link.name}
                 </Link>

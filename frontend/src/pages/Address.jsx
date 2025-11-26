@@ -342,7 +342,7 @@ export default function AddressForm() {
         <div className="lg:col-span-2">
           {showForm ? (
             <form onSubmit={handleSaveAddress} className="bg-white shadow-sm rounded">
-            <div className="bg-blue-600 text-white p-4 flex items-center gap-3">
+            <div className="bg-black text-white p-4 flex items-center gap-3">
               <span>1</span>
               <span className="font-medium">DELIVERY ADDRESS</span>
             </div>
@@ -361,7 +361,7 @@ export default function AddressForm() {
                   {formData.landmark && <div className="text-sm text-gray-700">Landmark: {formData.landmark}</div>}
                   {formData.alternatePhone && <div className="text-sm text-gray-700">Alt: {formData.alternatePhone}</div>}
                   <div className="mt-4 flex gap-3">
-                    <button type="button" onClick={() => setEditMode(true)} className="px-4 py-2 border rounded text-blue-600 border-blue-600 hover:bg-blue-50 cursor-pointer">Edit Address</button>
+                    <button type="button" onClick={() => setEditMode(true)} className="px-4 py-2 border rounded text-black border-black hover:bg-gray-50 cursor-pointer">Edit Address</button>
                     <button 
                       type="button" 
                       onClick={async () => {
@@ -401,7 +401,7 @@ export default function AddressForm() {
               <button
                 type="button"
                 onClick={handleUseCurrentLocation}
-                className="mb-6 bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-700 transition cursor-pointer"
+                className="mb-6 bg-black text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-800 transition cursor-pointer"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -518,7 +518,7 @@ export default function AddressForm() {
                             <div
                               key={state}
                               className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                                formData.state === state ? 'bg-blue-50 text-blue-700' : ''
+                                formData.state === state ? 'bg-gray-100 text-black' : ''
                               }`}
                               onClick={() => {
                                 setFormData({ ...formData, state });
@@ -600,7 +600,7 @@ export default function AddressForm() {
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="text-blue-600 hover:text-blue-700 px-6 py-3 rounded font-medium transition cursor-pointer w-full sm:w-auto text-center border border-blue-600 hover:bg-blue-50"
+                  className="text-black hover:text-gray-800 px-6 py-3 rounded font-medium transition cursor-pointer w-full sm:w-auto text-center border border-black hover:bg-gray-50"
                 >
                   CANCEL
                 </button>
@@ -615,7 +615,7 @@ export default function AddressForm() {
             </form>
           ) : (
             <div className="bg-white shadow-sm rounded">
-              <div className="bg-blue-600 text-white p-4 flex items-center gap-3">
+              <div className="bg-black text-white p-4 flex items-center gap-3">
                 <span>1</span>
                 <span className="font-medium">DELIVERY ADDRESS</span>
               </div>
@@ -641,7 +641,7 @@ export default function AddressForm() {
                         <button
                           type="button"
                           onClick={handleEditAddress}
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          className="text-black hover:text-gray-800 text-sm font-medium"
                         >
                           EDIT
                         </button>
