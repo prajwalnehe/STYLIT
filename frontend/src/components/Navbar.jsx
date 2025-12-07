@@ -49,10 +49,7 @@ const Navbar = () => {
     };
   }, []);
 
-  // Check authentication status - Using in-memory state instead of localStorage
   useEffect(() => {
-    // You can integrate this with your authentication context/provider
-    // For now, derive auth from localStorage token to keep Navbar in sync with Router guards
     const checkAuth = () => {
       try {
         const token = localStorage.getItem('auth_token');
@@ -73,8 +70,6 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    // Handle logout logic here
-    // Example: authContext.logout();
     try {
       localStorage.removeItem('auth_token');
     } catch {}
@@ -103,7 +98,6 @@ const Navbar = () => {
     }
   };
 
-  // Debounced fetch for inline search results
   useEffect(() => {
     const q = searchQuery.trim();
     if (q.length < 2) {
@@ -128,7 +122,6 @@ const Navbar = () => {
     return () => clearTimeout(t);
   }, [searchQuery]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const onClick = (e) => {
       const inMobile = searchWrapRefMobile.current && searchWrapRefMobile.current.contains(e.target);
@@ -139,11 +132,19 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
-  // Navigation links
+  // Navigation links matching suuupply style
   const navLinks = [
-    { name: 'HOME', path: '/' },
-    { name: 'ABOUT', path: '/about' },
-    { name: 'CONTACT', path: '/contact' },
+    { name: 'all products', path: '/shop' },
+    { name: 't-shirts', path: '/category/t-shirts' },
+    { name: 'shirts', path: '/category/shirts' },
+    { name: 'knitwear', path: '/category/knitwear' },
+    { name: 'sweatshirts', path: '/category/sweatshirts' },
+    { name: 'pants', path: '/category/pants' },
+    { name: 'outerwear', path: '/category/outerwear' },
+    { name: 'shoes', path: '/category/shoes' },
+    { name: 'accessories', path: '/category/accessories' },
+    { name: 'brands', path: '/category/brands' },
+    { name: 'about us', path: '/about' },
   ];
 
   const scrollToTop = () => {
@@ -154,23 +155,92 @@ const Navbar = () => {
   };
 
   return (
-    <nav
-      className="relative z-[70] bg-CCC7BF"
-    >
-      <div className="w-full px-0 sm:px-1 md:px-2 lg:px-3">
+    <nav className="relative z-[70] bg-white border-b border-gray-200">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo/Brand */}
-          <Link to="/" className="flex-shrink-0 ml-4 sm:ml-5 md:ml-6 lg:ml-8">
-            <img 
-              src="https://res.cloudinary.com/duc9svg7w/image/upload/v1763362340/ParidhanLogo_fxrahv.png" 
-              alt="PARIDHAAN Logo" 
-              className="h-10 sm:h-12 md:h-14 w-auto hover:scale-105 transition-transform duration-300"
-            />
+          <Link to="/" className="flex-shrink-0">
+            <span className="text-2xl md:text-3xl font-bold tracking-tight">STYLEIT</span>
           </Link>
 
-          {/* Mobile Search (visible only on small screens) */}
-          <div className="flex-1 min-w-0 px-2 md:hidden">
-            <div className="relative" ref={searchWrapRefMobile}>
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center space-x-6 xl:space-x-8 flex-1 justify-center">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={scrollToTop}
+                className="text-gray-700 hover:text-black transition-colors duration-200 text-sm uppercase tracking-wide whitespace-nowrap"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+
+          {/* Right Side Icons */}
+          <div className="flex items-center space-x-4 md:space-x-6">
+            {/* Search Icon */}
+            <div className="hidden md:block relative" ref={searchWrapRefDesktop}>
+              <button
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="p-2 text-gray-700 hover:text-black transition-colors"
+                aria-label="Search"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              {searchOpen && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-[80] p-4">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => { const v = e.target.value; setSearchQuery(v); setSearchOpen(v.trim().length >= 2); }}
+                    onKeyPress={handleSearchKeyPress}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                  {searchLoading && (
+                    <div className="px-4 py-3 text-sm text-gray-500">Searching…</div>
+                  )}
+                  {!searchLoading && searchQuery.trim() && searchResults.length === 0 && (
+                    <div className="px-4 py-3 text-sm text-gray-500">No products found</div>
+                  )}
+                  {!searchLoading && searchResults.length > 0 && (
+                    <ul className="max-h-80 overflow-auto divide-y divide-gray-100 mt-2">
+                      {searchResults.slice(0, 8).map((p) => (
+                        <li key={p._id || p.id || p.slug}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSearchOpen(false);
+                              navigate(`/product/${p._id || p.id || ''}`);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
+                          >
+                            <img
+                              src={p.images?.image1 || p.image || 'https://via.placeholder.com/60x80?text=No+Image'}
+                              alt={p.title || p.name || 'Product'}
+                              className="w-12 h-16 object-cover rounded-md border border-gray-100"
+                              onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/60x80?text=No+Image'; }}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-gray-900 truncate">{p.title || p.name || 'Product'}</p>
+                              {p.price && (
+                                <p className="text-xs text-gray-600">₹{Number(p.price).toLocaleString()}</p>
+                              )}
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Search */}
+            <div className="md:hidden relative" ref={searchWrapRefMobile}>
               <input
                 type="text"
                 placeholder="Search..."
@@ -178,11 +248,11 @@ const Navbar = () => {
                 onChange={(e) => { const v = e.target.value; setSearchQuery(v); setSearchOpen(v.trim().length >= 2); }}
                 onKeyPress={handleSearchKeyPress}
                 onFocus={() => { if (searchQuery.trim().length >= 2) setSearchOpen(true); }}
-                className="w-full px-3 py-1.5 pl-9 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent"
+                className="w-32 px-3 py-1.5 pl-9 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black"
               />
               <button
                 onClick={handleSearch}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
                 type="button"
                 aria-label="Search"
               >
@@ -208,7 +278,7 @@ const Navbar = () => {
                               setSearchOpen(false);
                               navigate(`/product/${p._id || p.id || ''}`);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-rose-50 text-left"
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
                           >
                             <img
                               src={p.images?.image1 || p.image || 'https://via.placeholder.com/60x80?text=No+Image'}
@@ -230,198 +300,108 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Search Bar - Takes remaining space */}
-          <div className="hidden md:flex items-center flex-1 max-w-3xl ml-4 lg:ml-8">
-            <div className="relative w-full" ref={searchWrapRefDesktop}>
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => { const v = e.target.value; setSearchQuery(v); setSearchOpen(v.trim().length >= 2); }}
-                onKeyPress={handleSearchKeyPress}
-                onFocus={() => { if (searchQuery.trim().length >= 2) setSearchOpen(true); }}
-                className="w-full px-3 py-1.5 pl-8 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
-              />
-              <button
-                onClick={handleSearch}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-800 transition-colors"
-                type="button"
+            {/* User Icon */}
+            {isAuthenticated ? (
+              <Link
+                to="/profile"
+                className="p-2 text-gray-700 hover:text-black transition-colors"
+                title="Profile"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </Link>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="p-2 text-gray-700 hover:text-black transition-colors"
+                title="Sign In"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </button>
-            </div>
-          </div>
-
-          {/* Desktop Navigation & Icons */}
-          <div className="hidden md:flex items-center space-x-2 lg:space-x-3 mr-4 sm:mr-5 md:mr-6 lg:mr-8">
-            {/* Desktop Navigation Links - HOME, ABOUT, CONTACT */}
-            <div className="flex items-center space-x-6 lg:space-x-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  onClick={scrollToTop}
-                  className="text-gray-700 hover:text-gray-800 font-serif font-bold transition-colors duration-200 text-sm whitespace-nowrap px-2"
-                  style={{ fontFamily: 'serif' }}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-
-            {/* Desktop Navigation Icons */}
-            <div className="flex items-center space-x-1">
-              <Link to="/wishlist" className="p-2 text-gray-700 hover:text-black relative">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {wishlistCount > 9 ? '9+' : wishlistCount}
-                  </span>
-                )}
-              </Link>
-              <Link to="/cart" className="p-2 text-gray-700 hover:text-black relative">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartCount > 9 ? '9+' : cartCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-
-          </div>
-
-          {/* User Icon / Login Button */}
-          <div className="hidden md:flex items-center">
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-2">
-                <Link
-                  to="/profile"
-                  className="p-2 text-gray-700 hover:text-gray-800 transition-colors duration-200"
-                  title="Profile"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                </Link>
-              </div>
-            ) : (
-              <>
-                <button
-                  onClick={handleLogin}
-                  className="p-2 text-gray-700 hover:text-gray-800 transition-colors duration-200 md:inline-flex lg:hidden"
-                  title="Sign In"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                </button>
-                <button
-                  onClick={handleLogin}
-                  className="hidden lg:inline-flex px-4 py-2 bg-black text-white rounded-lg font-medium hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800"
-                >
-                  Login
-                </button>
-              </>
             )}
-          </div>
 
-          {/* Mobile menu button - only show menu button on mobile */}
-          <div className="flex items-center md:hidden mr-4">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-black focus:outline-none"
-              aria-expanded="false"
-            >
-              <span className="sr-only">Open main menu</span>
-              {isMobileMenuOpen ? (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+            {/* Cart Icon */}
+            <Link to="/cart" className="p-2 text-gray-700 hover:text-black relative">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount > 9 ? '9+' : cartCount}
+                </span>
               )}
-            </button>
+            </Link>
+
+            {/* Language Selector */}
+            <div className="hidden md:block">
+              <select className="text-sm text-gray-700 bg-transparent border-none focus:outline-none cursor-pointer">
+                <option>English</option>
+              </select>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="flex items-center lg:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-black focus:outline-none"
+                aria-expanded="false"
+              >
+                <span className="sr-only">Open main menu</span>
+                {isMobileMenuOpen ? (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div id="mobile-menu" className="md:hidden py-6 border-t border-gray-200 bg-white shadow-lg">
-            {/* Mobile Navigation Links */}
-            <nav className="grid grid-cols-2 sm:grid-cols-3 gap-4 px-2">
+          <div id="mobile-menu" className="lg:hidden py-6 border-t border-gray-200 bg-white">
+            <nav className="grid grid-cols-2 gap-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-center text-gray-700 hover:text-gray-800 hover:bg-rose-50 font-serif font-bold py-3 px-4 rounded-lg transition-all duration-200 text-sm sm:text-base border border-gray-200"
-                  style={{ fontFamily: 'serif' }}
+                  className="text-gray-700 hover:text-black py-2 px-4 rounded transition-colors text-sm uppercase"
                 >
                   {link.name}
                 </Link>
               ))}
             </nav>
-
-            {/* Auth Section in Mobile Menu */}
             {isAuthenticated ? (
-              <div className="mt-6 pt-6 px-2 border-t border-gray-200">
+              <div className="mt-6 pt-6 border-t border-gray-200">
                 <button
                   onClick={() => {
                     handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200"
+                  className="w-full py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  <span>Logout</span>
+                  Logout
                 </button>
               </div>
             ) : (
-              <div className="mt-6 pt-6 px-2 border-t border-gray-200">
+              <div className="mt-6 pt-6 border-t border-gray-200">
                 <button
                   onClick={() => {
                     handleLogin();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200"
+                  className="w-full py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                  <span>Sign In</span>
+                  Sign In
                 </button>
               </div>
             )}
