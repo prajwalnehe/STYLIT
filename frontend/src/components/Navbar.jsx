@@ -160,7 +160,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo/Brand */}
           <Link to="/" className="flex-shrink-0">
-            <span className="text-2xl md:text-3xl font-bold tracking-tight">STYLEIT</span>
+            <img 
+              src="https://res.cloudinary.com/duc9svg7w/image/upload/v1765123531/30193-removebg-preview_ybapoz.png" 
+              alt="STYLEIT Logo" 
+              className="h-50 md:h-50 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation Links */}
@@ -178,7 +182,7 @@ const Navbar = () => {
           </div>
 
           {/* Right Side Icons */}
-          <div className="flex items-center space-x-4 md:space-x-6">
+          <div className="flex items-center space-x-2 md:space-x-3 ml-8 md:ml-12 lg:ml-16">
             {/* Search Icon */}
             <div className="hidden md:block relative" ref={searchWrapRefDesktop}>
               <button
@@ -335,13 +339,6 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-
-            {/* Language Selector */}
-            <div className="hidden md:block">
-              <select className="text-sm text-gray-700 bg-transparent border-none focus:outline-none cursor-pointer">
-                <option>English</option>
-              </select>
-            </div>
 
             {/* Mobile menu button */}
             <div className="flex items-center lg:hidden">
