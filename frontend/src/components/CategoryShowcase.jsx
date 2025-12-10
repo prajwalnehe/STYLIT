@@ -7,7 +7,7 @@ const categories = [
     id: 1,
     name: "SHIRTS",
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270065/f41cb7e3-f91a-4dc1-8738-35f610929e62.png',
-    path: '/category/shirts'
+    path: '/category/formal-shirts'
   },
   {
     id: 2,
@@ -24,7 +24,7 @@ const categories = [
   {
     id: 4,
     name: 'Shoes',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+    image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765356722/c8ebeacb5152e0d91ea0158bc3d94f8b_uaalsc.jpg',
     path: '/category/shoes'
   },
   {
@@ -37,7 +37,7 @@ const categories = [
     id: 6,
     name: 'SNEAKERS',
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270465/11624d7b-c45e-4f32-a460-59529077ee08.png',
-    path: '/category/shoes'
+    path: '/category/sneakers'
   },
    {
     id: 7,

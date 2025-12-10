@@ -1,14 +1,5 @@
 import { Product } from '../models/product.js';
 
-const CATEGORY_GROUPS = {
-  'Designer Sarees': [
-    'Party Wear Saree',
-    'Wedding Sarees',
-    'Festive Sarees',
-    'Bollywood Style Sarees',
-    'Heavy Embroidered Sarees'
-  ]
-};
 
 // Category mapping for URL slugs to database category names
 const CATEGORY_MAPPING = {

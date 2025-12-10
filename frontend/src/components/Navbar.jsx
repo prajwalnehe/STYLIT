@@ -164,9 +164,9 @@ const Navbar = () => {
     { name: 'pants', path: '/category/pants' },
     { name: 'SHORTS', path: '/category/shorts' },
     { name: 'shoes', path: '/category/shoes' },
+    { name: 'SNEAKERS', path: '/category/sneakers' },
     { name: 'accessories', path: '/category/accessories' },
     { name: 'PERFUMES', path: '/category/perfumes' },
-    { name: 'about us', path: '/about' },
   ];
 
   const scrollToTop = () => {
@@ -179,7 +179,7 @@ const Navbar = () => {
   return (
     <nav className="relative z-[70] bg-white border-b border-gray-200">
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12">
-        <div className="flex items-center justify-between h-14 sm:h-16 md:h-18 lg:h-20 gap-2">
+        <div className="flex items-center justify-between h-14 sm:h-16 md:h-18 lg:h-20 gap-2 md:gap-2">
           {/* Logo/Brand */}
           <Link to="/" className="flex-shrink-0 z-10">
             <img 
@@ -204,7 +204,7 @@ const Navbar = () => {
           </div>
 
           {/* Right Side Icons */}
-          <div className="flex items-center space-x-0.5 sm:space-x-1 md:space-x-2 lg:space-x-3 xl:space-x-4 flex-shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-2 md:space-x-2 lg:space-x-3 xl:space-x-4 flex-shrink-0">
             {/* Search Icon - Desktop */}
             <div className="hidden md:block relative" ref={searchWrapRefDesktop}>
               <button
@@ -266,7 +266,7 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Search - Smaller */}
-            <div className="md:hidden relative w-20 sm:w-24" ref={searchWrapRefMobile}>
+            <div className="md:hidden relative flex-1 max-w-[180px] sm:max-w-[220px] mx-2 sm:mx-3" ref={searchWrapRefMobile}>
               <input
                 type="text"
                 placeholder="Search..."
@@ -351,6 +351,18 @@ const Navbar = () => {
                 </button>
               )}
             </div>
+
+            {/* Wishlist Icon - Hidden on mobile */}
+            <Link to="/wishlist" className="hidden md:block p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black relative flex-shrink-0" title="Wishlist">
+              <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              {wishlistCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-black text-white text-[9px] sm:text-[10px] md:text-xs rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 flex items-center justify-center font-medium">
+                  {wishlistCount > 9 ? '9+' : wishlistCount}
+                </span>
+              )}
+            </Link>
 
             {/* Cart Icon - Hidden on mobile */}
             <Link to="/cart" className="hidden md:block p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black relative flex-shrink-0">
