@@ -20,6 +20,22 @@ const styles = `
 
 // NOTE: staticCategories and CategoryFilterList have been removed as requested.
 
+// Wishlist helper functions
+const readWishlist = () => {
+  try {
+    const raw = localStorage.getItem('wishlist');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeWishlist = (items) => {
+  try {
+    localStorage.setItem('wishlist', JSON.stringify(items));
+  } catch {}
+};
+
 const ProductList = ({ defaultCategory } = {}) => {
     const { categoryName, subCategoryName } = useParams();
     const navigate = useNavigate();
@@ -30,7 +46,8 @@ const ProductList = ({ defaultCategory } = {}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
-    const [sortOption, setSortOption] = useState('featured'); 
+    const [sortOption, setSortOption] = useState('featured');
+    const [wishlist, setWishlist] = useState([]); // Wishlist products 
     
     // Filter states
     const [selectedPriceRange, setSelectedPriceRange] = useState(null);
@@ -113,6 +130,31 @@ const ProductList = ({ defaultCategory } = {}) => {
     const effectiveCategory = normalize(rawCategory);
     const displayCategoryName = getCategoryDisplayName(rawCategory);
         
+    // --- Load Wishlist ---
+    useEffect(() => {
+        const loadWishlist = () => {
+            setWishlist(readWishlist());
+        };
+        
+        loadWishlist();
+        
+        // Listen for wishlist updates
+        const handleWishlistUpdate = () => {
+            loadWishlist();
+        };
+        
+        window.addEventListener('wishlist:updated', handleWishlistUpdate);
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'wishlist') {
+                loadWishlist();
+            }
+        });
+        
+        return () => {
+            window.removeEventListener('wishlist:updated', handleWishlistUpdate);
+        };
+    }, []);
+
     // --- Data Fetching ---
     useEffect(() => {
         const load = async () => {
@@ -214,6 +256,124 @@ const ProductList = ({ defaultCategory } = {}) => {
     const handleCardClick = useCallback((product) => {
         navigate(`/product/${product._id}`);
     }, [navigate]);
+
+    // Check if product is in wishlist
+    const isWishlisted = useCallback((productId) => {
+        return wishlist.some(item => (item._id || item.id) === productId);
+    }, [wishlist]);
+
+    // Toggle wishlist for a product
+    const toggleWishlist = useCallback((product, e) => {
+        if (e) {
+            e.stopPropagation();
+        }
+        
+        const pid = product._id;
+        if (!pid) return;
+        
+        const list = readWishlist();
+        const exists = list.some(p => (p._id || p.id) === pid);
+        
+        let finalPrice = product.price || (product.mrp * (1 - (product.discountPercent || 0) / 100)) || product.mrp || 0;
+        
+        if (exists) {
+            // Remove from wishlist
+            const next = list.filter(p => (p._id || p.id) !== pid);
+            writeWishlist(next);
+            setWishlist(next);
+        } else {
+            // Add to wishlist
+            const item = {
+                _id: pid,
+                title: product.title,
+                images: product.images,
+                price: finalPrice,
+                mrp: product.mrp,
+                discountPercent: product.discountPercent || 0,
+            };
+            const next = [item, ...list.filter(p => (p._id || p.id) !== pid)];
+            writeWishlist(next);
+            setWishlist(next);
+        }
+        
+        // Dispatch event for other components
+        try { 
+            window.dispatchEvent(new Event('wishlist:updated')); 
+        } catch {}
+    }, []);
+
+    // Helper function to get category/type label for overlay
+    const getCategoryLabel = (product) => {
+        const info = product.product_info || {};
+        const category = (product.category || '').toLowerCase();
+        
+        // Check for material-based labels
+        if (info.tshirtMaterial || info.pantMaterial || info.shoeMaterial) {
+            const material = info.tshirtMaterial || info.pantMaterial || info.shoeMaterial;
+            if (material && material.toUpperCase().includes('LINEN')) {
+                return 'LINEN BLEND';
+            }
+            if (material && material.toUpperCase().includes('COTTON')) {
+                return 'COTTON BLEND';
+            }
+        }
+        
+        // Check for product type labels
+        if (category.includes('utility') || info.pantType?.toLowerCase().includes('utility')) {
+            return 'UTILITY POCKET';
+        }
+        if (category.includes('holiday') || product.title?.toLowerCase().includes('holiday')) {
+            return 'HOLIDAY';
+        }
+        if (category.includes('oversized') || info.tshirtFit?.toLowerCase().includes('oversized')) {
+            return 'OVERSIZED FIT';
+        }
+        
+        // Fallback to category or manufacturer
+        if (info.manufacturer) {
+            return info.manufacturer.toUpperCase();
+        }
+        
+        return null;
+    };
+
+    // Helper function to format product title for display
+    const formatProductTitle = (product) => {
+        const info = product.product_info || {};
+        const title = product.title || '';
+        
+        // Try to extract color/material from title
+        // Format like "Cotton Linen: Sky Blue"
+        if (info.tshirtColor || info.pantColor || info.shoeColor) {
+            const color = info.tshirtColor || info.pantColor || info.shoeColor;
+            const material = info.tshirtMaterial || info.pantMaterial || info.shoeMaterial || 'Cotton';
+            return `${material}: ${color}`;
+        }
+        
+        return title;
+    };
+
+    // Helper function to get category display name
+    const getCategoryDisplay = (product) => {
+        const category = product.category || '';
+        const info = product.product_info || {};
+        
+        // Map categories to display names
+        if (category.toLowerCase().includes('tshirt') || category.toLowerCase().includes('t-shirt')) {
+            return info.tshirtMaterial ? `${info.tshirtMaterial} Shirts` : 'T-Shirts';
+        }
+        if (category.toLowerCase().includes('shirt')) {
+            return info.tshirtMaterial ? `${info.tshirtMaterial} Shirts` : 'Shirts';
+        }
+        if (category.toLowerCase().includes('pant')) {
+            return info.pantType ? `Men ${info.pantType} Pants` : 'Pants';
+        }
+        if (category.toLowerCase().includes('holiday')) {
+            return 'Holiday Shirts';
+        }
+        
+        return category || 'Products';
+    };
 
     const activeFilterCount = [
         selectedFabrics.length,
@@ -426,72 +586,75 @@ const ProductList = ({ defaultCategory } = {}) => {
                             </div>
                         ) : (
                             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                                {filteredProducts.map((p) => (
-                                    <div
-                                        key={p._id || p.title}
-                                        className="group bg-white overflow-hidden transition-all duration-300 cursor-pointer"
-                                        onClick={() => handleCardClick(p)}
-                                    >
-                                        <div className="relative w-full aspect-[3/4] bg-gray-50">
-                                            <img
-                                                src={p.images?.image1 || 'https://via.placeholder.com/300x400?text=Image+Not+Available'}
-                                                alt={p.title}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                onError={(e) => {e.target.onerror = null; e.target.src = 'https://via.placeholder.com/300x400?text=Image+Not+Available';}}
-                                            />
-                                            
-                                            {/* Quick Actions Overlay */}
-                                            <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                {filteredProducts.map((p) => {
+                                    const productTitle = formatProductTitle(p);
+                                    const categoryDisplay = getCategoryDisplay(p);
+                                    const finalPrice = Math.round(p.price || (p.mrp * (1 - (p.discountPercent || 0) / 100)) || p.mrp || 0);
+                                    const wishlisted = isWishlisted(p._id);
+                                    
+                                    return (
+                                        <div
+                                            key={p._id || p.title}
+                                            className="group bg-white overflow-hidden transition-all duration-300 cursor-pointer"
+                                            onClick={() => handleCardClick(p)}
+                                        >
+                                            <div className="relative w-full aspect-[3/4] bg-gray-50 overflow-hidden">
+                                                <img
+                                                    src={p.images?.image1 || 'https://via.placeholder.com/300x400?text=Image+Not+Available'}
+                                                    alt={p.title}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                    onError={(e) => {e.target.onerror = null; e.target.src = 'https://via.placeholder.com/300x400?text=Image+Not+Available';}}
+                                                />
+                                                
+                                                {/* Heart Icon - Top Right (Always Visible) */}
                                                 <button 
-                                                    onClick={(e) => {e.stopPropagation(); alert('Added to Wishlist!');}} 
-                                                    className="p-2 bg-white/80 text-gray-800 rounded-full hover:bg-white transition-colors transform translate-x-2 group-hover:translate-x-0 duration-300 delay-100"
+                                                    onClick={(e) => toggleWishlist(p, e)} 
+                                                    className="absolute top-3 right-3 p-1.5 bg-white/95 hover:bg-white rounded-full transition-all duration-200 z-10 shadow-sm"
                                                 >
-                                                    <FaHeart className="w-4 h-4" />
+                                                    <FaHeart 
+                                                        className={`w-4 h-4 transition-colors ${
+                                                            wishlisted 
+                                                                ? 'text-pink-500' 
+                                                                : 'text-gray-700 hover:text-pink-500'
+                                                        }`} 
+                                                    />
                                                 </button>
-                                            </div>
 
-                                            {/* Discount/Tag Badge */}
-                                            {p.product_info?.manufacturer === 'NOMAD LIFE' && (
-                                                 <span className="absolute top-3 left-3 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-md">
-                                                    OVERSIZED FIT
-                                                </span>
-                                            )}
-                                            
-                                            {p.discountPercent > 0 && (
-                                                <span className="absolute bottom-3 left-3 bg-green-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md">
-                                                    {p.discountPercent}% OFF
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* Product Details */}
-                                        <div className="relative p-3 sm:p-3">
-                                            
-                                            {/* Brand/Manufacturer */}
-                                            <h3 className="text-xs font-medium text-gray-500 line-clamp-1 mb-1">
-                                                {p.product_info?.manufacturer || 'Artisan Weaves'}
-                                            </h3>
-                                            
-                                            {/* Product Title */}
-                                            <p className="text-sm font-bold text-gray-900 line-clamp-2 mb-1 min-h-[1.5rem]">{p.title || 'Untitled Product'}</p>
-                                        
-                                            {/* Price */}
-                                            <div className="flex items-baseline gap-1 mt-1">
-                                                <div className="flex items-center text-gray-900">
-                                                    <FaRupeeSign className="h-3 w-3" />
-                                                    <span className="text-base font-extrabold ml-0.5">
-                                                        {Math.round(p.price || (p.mrp * (1 - (p.discountPercent || 0) / 100)) || p.mrp || 0).toLocaleString()}
-                                                    </span>
-                                                </div>
-                                                {p.mrp && p.mrp > p.price && (
-                                                    <span className="text-xs text-gray-400 line-through ml-1">
-                                                        ₹{p.mrp.toLocaleString()}
+                                                {/* Discount Badge - Bottom Left (if applicable) */}
+                                                {p.discountPercent > 0 && (
+                                                    <span className="absolute bottom-3 left-3 bg-green-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md">
+                                                        {p.discountPercent}% OFF
                                                     </span>
                                                 )}
                                             </div>
+
+                                            {/* Product Details */}
+                                            <div className="relative pt-3 pb-2 px-1">
+                                                {/* Product Title */}
+                                                <p className="text-sm font-normal text-gray-900 line-clamp-1 mb-1.5">
+                                                    {productTitle || p.title || 'Untitled Product'}
+                                                </p>
+                                                
+                                                {/* Category Label */}
+                                                <p className="text-xs font-normal text-gray-600 mb-2.5">
+                                                    {categoryDisplay}
+                                                </p>
+                                            
+                                                {/* Price */}
+                                                <div className="flex items-baseline gap-1.5">
+                                                    <span className="text-base font-medium text-gray-900">
+                                                        ₹ {finalPrice.toLocaleString()}
+                                                    </span>
+                                                    {p.mrp && p.mrp > finalPrice && (
+                                                        <span className="text-xs text-gray-400 line-through">
+                                                            ₹{p.mrp.toLocaleString()}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

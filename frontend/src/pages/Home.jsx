@@ -71,7 +71,7 @@ const Home = () => {
         
         {/* Products Section without background */}
         <section className="py-6">
-          <FeaturedProducts category="shirts" layout="grid" /> 
+          <FeaturedProducts category="" layout="grid" /> 
         </section>
 
         {/* Banner Image */}
@@ -87,11 +87,11 @@ const Home = () => {
 
         {/* Perfumes Products Section */}
         <section className="py-6">
-          <FeaturedProducts category="accessories" layout="grid" /> 
+          <FeaturedProducts category="perfumes" layout="grid" /> 
           {/* Explore More Button */}
           <div className="flex justify-center mt-8 mb-4">
             <Link
-              to="/category/accessories"
+              to="/category/perfumes"
               className="inline-block bg-black text-white px-8 py-3 rounded-lg font-semibold text-sm md:text-base uppercase tracking-wide hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
               Explore more perfume

@@ -162,8 +162,10 @@ const Navbar = () => {
     { name: 'tshirts', path: '/category/tshirts' },
     { name: 'Formal shirts', path: '/category/formal-shirts' },
     { name: 'pants', path: '/category/pants' },
+    { name: 'SHORTS', path: '/category/shorts' },
     { name: 'shoes', path: '/category/shoes' },
-    { name: 'PERFUMES', path: '/category/accessories' },
+    { name: 'accessories', path: '/category/accessories' },
+    { name: 'PERFUMES', path: '/category/perfumes' },
     { name: 'about us', path: '/about' },
   ];
 
@@ -325,31 +327,33 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* User Icon */}
-            {isAuthenticated ? (
-              <Link
-                to="/profile"
-                className="p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black transition-colors flex-shrink-0"
-                title="Profile"
-              >
-                <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </Link>
-            ) : (
-              <button
-                onClick={handleLogin}
-                className="p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black transition-colors flex-shrink-0"
-                title="Sign In"
-              >
-                <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </button>
-            )}
+            {/* User Icon - Hidden on mobile */}
+            <div className="hidden md:block">
+              {isAuthenticated ? (
+                <Link
+                  to="/profile"
+                  className="p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black transition-colors flex-shrink-0"
+                  title="Profile"
+                >
+                  <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </Link>
+              ) : (
+                <button
+                  onClick={handleLogin}
+                  className="p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black transition-colors flex-shrink-0"
+                  title="Sign In"
+                >
+                  <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </button>
+              )}
+            </div>
 
-            {/* Cart Icon */}
-            <Link to="/cart" className="p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black relative flex-shrink-0">
+            {/* Cart Icon - Hidden on mobile */}
+            <Link to="/cart" className="hidden md:block p-1 sm:p-1.5 md:p-2 text-gray-700 hover:text-black relative flex-shrink-0">
               <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>

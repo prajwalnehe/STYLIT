@@ -4,21 +4,24 @@ import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa'; 
 import { fetchSarees } from '../services/api';
 
-const FeaturedProducts = ({ category = 'shirts' }) => {
+const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts = 8 }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
+  const isGridLayout = layout === 'grid';
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const data = await fetchSarees(category);
-        // Show all products for horizontal scroll
-        setProducts(data || []);
+        // Pass empty string to fetch all products from all categories
+        const data = await fetchSarees(category || '');
+        // Limit products for grid layout, show all for scroll layout
+        const productList = isGridLayout ? (data || []).slice(0, maxProducts) : (data || []);
+        setProducts(productList);
       } catch (error) {
         console.error('Error fetching products:', error);
         setProducts([]);
@@ -27,7 +30,7 @@ const FeaturedProducts = ({ category = 'shirts' }) => {
       }
     };
     loadProducts();
-  }, [category]);
+  }, [category, isGridLayout, maxProducts]);
 
   const checkScrollability = () => {
     if (scrollContainerRef.current) {
@@ -110,6 +113,63 @@ const FeaturedProducts = ({ category = 'shirts' }) => {
   if (products.length === 0) {
     return null;
   }
+
+  // Grid Layout (2 rows)
+  if (isGridLayout) {
+    return (
+      <section className="py-8 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Grid Container - 2 rows, responsive columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+            {products.map((product) => (
+              <div 
+                key={product._id || product.id} 
+                className="group bg-white overflow-hidden flex flex-col cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                onClick={() => {
+                  const productId = product._id || product.id;
+                  if (productId) {
+                    handleProductClick(productId);
+                  }
+                }}
+              >
+                {/* Image Container */}
+                <div className="relative pt-[130%]">
+                  <img 
+                    src={product.images?.image1 || product.image || 'https://via.placeholder.com/400x500?text=No+Image'} 
+                    alt={product.title || product.name} 
+                    className="absolute inset-0 w-full h-full object-cover" 
+                  />
+                  
+                  {/* Heart Icon (Top Right) */}
+                  <button 
+                    className="absolute top-2 right-2 p-2 bg-white/70 rounded-full hover:bg-white text-gray-700 transition-colors duration-200 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Handle wishlist logic here
+                    }}
+                  >
+                    <FaHeart className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                {/* Text Details */}
+                <div className="pt-2 pb-4 flex-1 flex flex-col text-left">
+                  <h3 className="text-sm font-semibold text-gray-800 leading-tight mb-1 truncate">
+                    {product.title || product.name}
+                  </h3>
+                  <div className="text-sm font-bold text-gray-900">
+                    ₹ {Math.round((product.price || product.mrp || 0) * (1 - (product.discountPercent || 0) / 100)).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Horizontal Scroll Layout (default)
   return (
     // Section matches the main background of the image (usually white)
     <section className="py-16 bg-white">
@@ -180,7 +240,7 @@ const FeaturedProducts = ({ category = 'shirts' }) => {
                 
                 {/* Price - dark, bold, slightly smaller than name */}
                 <div className="text-sm font-bold text-gray-900">
-                  ₹ {((product.price || product.mrp || 0) * (1 - (product.discountPercent || 0) / 100)).toLocaleString()}
+                  ₹ {Math.round((product.price || product.mrp || 0) * (1 - (product.discountPercent || 0) / 100)).toLocaleString()}
                 </div>
               </div>
             </div>

@@ -7,49 +7,49 @@ const categories = [
     id: 1,
     name: "SHIRTS",
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270065/f41cb7e3-f91a-4dc1-8738-35f610929e62.png',
-    path: '/category/men'
+    path: '/category/shirts'
   },
   {
     id: 2,
     name: "TSHIRTS",
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270201/2bc21bba-d836-46f0-81a0-6e045d2b07fd.png',
-    path: '/category/women'
+    path: '/category/tshirts'
   },
   {
     id: 3,
-    name: 'ACCESSORIES',
+    name: 'PERFUMES',
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270303/8ebb88f6-a40e-48a5-a1f3-6b98f254c666.png',
-    path: '/category/accessories'
+    path: '/category/perfumes'
   },
   {
     id: 4,
-    name: 'FOOTWEAR',
+    name: 'Shoes',
     image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    path: '/category/footwear'
+    path: '/category/shoes'
   },
   {
     id:5,
     name: 'PANTS',
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270378/ce7c75f8-2069-4b99-be54-f0fbefda46f3.png',
-    path: '/category/footwear'
+    path: '/category/pants'
   },
    {
     id: 6,
     name: 'SNEAKERS',
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270465/11624d7b-c45e-4f32-a460-59529077ee08.png',
-    path: '/category/footwear'
+    path: '/category/shoes'
   },
    {
     id: 7,
     name: 'WATCHES',
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270630/e84cc747-7a2e-4a65-ad85-0750fc16b74c.png',
-    path: '/category/footwear'
+    path: '/category/accessories'
   },
    {
     id: 8,
     name: 'SHORTS & BOXERS',
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270714/557c7404-59a5-46d4-84a9-5fa505f2e7dc.png',
-    path: '/category/footwear'
+    path: '/category/shorts'
   }
 ];
 
@@ -57,7 +57,7 @@ const CategoryShowcase = () => {
   return (
     // Outer Container: White background, tight vertical padding
     <div className="py-12 sm:py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         
         {/* Header: Centered, simple, capitalized text */}
         <h2 className="text-xl font-medium tracking-widest uppercase text-gray-900 text-center mb-10 sm:mb-12">
