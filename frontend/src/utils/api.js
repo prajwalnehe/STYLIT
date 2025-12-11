@@ -9,12 +9,20 @@ async function request(path, options = {}) {
     ...(options.headers || {}),
     ...(!isCookieSession && token ? { Authorization: `Bearer ${token}` } : {}),
   };
-  const res = await fetch(url, { ...options, headers, credentials: 'include' });
-  const text = await res.text();
-  let data;
-  try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
-  if (!res.ok) throw new Error(data?.message || 'Request failed');
-  return data;
+  try {
+    const res = await fetch(url, { ...options, headers, credentials: 'include' });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
+    if (!res.ok) throw new Error(data?.message || `Request failed with status ${res.status}`);
+    return data;
+  } catch (error) {
+    // Handle network errors (Failed to fetch)
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error(`Network error: Unable to connect to server. Please check if the backend is running at ${API_BASE_URL}`);
+    }
+    throw error;
+  }
 }
 
 export const api = {

@@ -94,11 +94,15 @@ const AdminProducts = () => {
 
   const openEditModal = (product) => {
     setEditingProduct(product);
+    // Ensure _id is a string (MongoDB ObjectIds need to be converted)
+    const productId = product._id?.toString ? product._id.toString() : String(product._id || '');
+    const mrp = Number(product.mrp) || 0;
+    const discountPercent = Number(product.discountPercent) || 0;
     setEditForm({
-      _id: product._id,
-      mrp: product.mrp,
-      discountPercent: product.discountPercent || 0,
-      price: Math.round(product.mrp - (product.mrp * (product.discountPercent || 0)) / 100)
+      _id: productId,
+      mrp: mrp,
+      discountPercent: discountPercent,
+      price: Math.round(mrp - (mrp * discountPercent) / 100)
     });
     setIsEditModalOpen(true);
   };
@@ -128,6 +132,9 @@ const AdminProducts = () => {
     setError('');
     setSaving(true);
     try {
+      if (!editForm._id) {
+        throw new Error('Product ID is missing');
+      }
       await api.admin.updateProduct(editForm._id, {
         mrp: Number(editForm.mrp),
         discountPercent: Number(editForm.discountPercent) || 0
@@ -136,8 +143,10 @@ const AdminProducts = () => {
       await load();
       closeEditModal();
     } catch (e) {
-      setError(e.message || 'Failed to update product');
-      setToast({ show: true, text: e.message || 'Failed to update product', type: 'error' });
+      const errorMessage = e.message || 'Failed to update product';
+      setError(errorMessage);
+      setToast({ show: true, text: errorMessage, type: 'error' });
+      console.error('Error updating product:', e);
     } finally {
       setSaving(false);
       setTimeout(() => setToast(t => ({ ...t, show: false })), 2000);
@@ -342,10 +351,10 @@ const AdminProducts = () => {
               <div className="bg-gray-50 p-3 rounded">
                 <div className="text-sm text-gray-600 mb-1">Selling Price:</div>
                 <div className="text-lg font-semibold">
-                  ₹{editForm.price ? editForm.price.toLocaleString('en-IN') : '0.00'}
+                  ₹{(editForm.price || 0).toLocaleString('en-IN')}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                  (MRP - {editForm.discountPercent}%)
+                  (MRP - {editForm.discountPercent || 0}%)
                 </div>
               </div>
               

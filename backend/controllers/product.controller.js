@@ -60,12 +60,6 @@ export const getProducts = async (req, res) => {
         });
       }
 
-      if (CATEGORY_GROUPS[category]) {
-        CATEGORY_GROUPS[category].forEach((sub) => {
-          orConditions.push({ category: { $regex: new RegExp(sub, 'i') } });
-        });
-      }
-
       // For shirts, add strict exclusion to prevent matching any Tshirt variations
       if (normalizedCategory === 'shirts') {
         query = {
