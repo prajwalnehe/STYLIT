@@ -43,7 +43,7 @@ const categories = [
     id: 7,
     name: 'WATCHES',
     image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765270630/e84cc747-7a2e-4a65-ad85-0750fc16b74c.png',
-    path: '/category/accessories'
+    path: '/category/watches'
   },
    {
     id: 8,

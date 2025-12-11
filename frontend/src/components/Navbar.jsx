@@ -165,7 +165,7 @@ const Navbar = () => {
     { name: 'SHORTS', path: '/category/shorts' },
     { name: 'shoes', path: '/category/shoes' },
     { name: 'SNEAKERS', path: '/category/sneakers' },
-    { name: 'accessories', path: '/category/accessories' },
+    { name: 'Watches', path: '/category/watches' },
     { name: 'PERFUMES', path: '/category/perfumes' },
   ];
 

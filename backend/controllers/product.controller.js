@@ -7,7 +7,8 @@ const CATEGORY_MAPPING = {
   't-shirts': ['TShirts', 't-shirt', 't-shirt', 'tshirt', 't shirt', 't shirts', 'T-Shirt', 'T-Shirts'],
   't shirt': ['TShirts', 't-shirt', 't-shirt', 'tshirt', 't shirt', 't shirts', 'T-Shirt', 'T-Shirts'],
   't shirts': ['TShirts', 't-shirt', 't-shirt', 'tshirt', 't shirt', 't shirts', 'T-Shirt', 'T-Shirts'],
-  'shirts': ['shirts', 'shirt', 'Shirts', 'Shirt']
+  'shirts': ['shirts', 'shirt', 'Shirts', 'Shirt'],
+  'watches': ['WATCHES', 'Watches', 'watches', 'watch', 'Watch', 'WATCH']
 };
 
 export const getProducts = async (req, res) => {
