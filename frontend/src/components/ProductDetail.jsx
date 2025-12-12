@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { FaShoppingCart, FaRupeeSign, FaArrowLeft, FaStar, FaRegStar, FaBolt, FaSpinner, FaTimes, FaExpand, FaHeart, FaRegHeart, FaShareAlt, FaComment } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
 import { fetchSareeById } from "../services/api";
+import ProductSuggestions from "./ProductSuggestions";
 
 const readWishlist = () => {
   try {
@@ -524,6 +525,15 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Product Suggestions */}
+      {product && (
+        <ProductSuggestions 
+          currentProductId={product._id || id}
+          category={product.category}
+          maxProducts={8}
+        />
+      )}
     </div>
   );
 };
