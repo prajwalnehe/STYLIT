@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 // FaHeart is used for the favorite icon seen in the top right of the cards
-import { FaHeart, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa'; 
+import { FaHeart, FaStar, FaChevronLeft, FaChevronRight, FaSpinner } from 'react-icons/fa'; 
 import { fetchSarees } from '../services/api';
 
 const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts = 8 }) => {
@@ -100,8 +100,9 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
     return (
       <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center py-12">
-            <div className="loader"></div>
+          <div className="flex justify-center items-center py-20 text-gray-600">
+            <FaSpinner className="w-6 h-6 animate-spin mr-3 text-amber-700" />
+            <span className="text-lg">Loading products...</span>
           </div>
         </div>
       </section>
