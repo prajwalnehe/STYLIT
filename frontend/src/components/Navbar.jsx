@@ -177,7 +177,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="relative z-[70] bg-white border-b border-gray-200">
+    <nav className="relative z-[70] bg-white border-b border-gray-200 border-t-0">
       <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12">
         <div className="flex items-center justify-between h-14 sm:h-16 md:h-18 lg:h-20 gap-2 md:gap-2">
           {/* Logo/Brand */}
