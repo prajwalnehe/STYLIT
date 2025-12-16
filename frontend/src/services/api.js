@@ -211,6 +211,47 @@ export const verifyPayment = async (payload) => {
   return res.json();
 };
 
+export const createCODOrder = async () => {
+  try {
+    const res = await fetch(`${API_URL}/payment/cod`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      credentials: 'include',
+    });
+    
+    const contentType = res.headers.get('content-type');
+    let errorData = {};
+    
+    if (!res.ok) {
+      try {
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await res.json();
+        } else {
+          const text = await res.text();
+          errorData = { message: text || `HTTP ${res.status} ${res.statusText}` };
+        }
+      } catch (parseError) {
+        errorData = { message: `HTTP ${res.status} ${res.statusText}` };
+      }
+      
+      const errorMessage = errorData?.error || errorData?.message || `Failed to create COD order (${res.status})`;
+      console.error('COD Order Error:', errorMessage, errorData);
+      throw new Error(errorMessage);
+    }
+    
+    return await res.json();
+  } catch (error) {
+    // Handle network errors
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      const networkError = new Error('Network error: Unable to connect to server. Please check your connection.');
+      console.error('COD Order Network Error:', networkError);
+      throw networkError;
+    }
+    // Re-throw other errors (they already have the message)
+    throw error;
+  }
+};
+
 export const getMyOrders = async () => {
   const res = await fetch(`${API_URL}/orders`, {
     headers: { 'Content-Type': 'application/json', ...authHeaders() },

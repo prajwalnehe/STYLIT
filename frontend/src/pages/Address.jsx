@@ -1,7 +1,7 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { getMyAddress, saveMyAddress, deleteAddressById, createPaymentOrder, verifyPayment } from '../services/api';
+import { getMyAddress, saveMyAddress, deleteAddressById, createPaymentOrder, verifyPayment, createCODOrder } from '../services/api';
 
 const indianStates = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -65,6 +65,8 @@ export default function AddressForm() {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [showForm, setShowForm] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState('online'); // 'online' or 'cod'
+  const [processingOrder, setProcessingOrder] = useState(false);
   const { cart, cartTotal: total, loadCart } = useCart();
 
   // Calculate price details
@@ -95,7 +97,39 @@ export default function AddressForm() {
       alert('Please save your delivery address first.');
       return;
     }
+    
     try {
+      // Handle Cash on Delivery
+      if (paymentMethod === 'cod') {
+        setProcessingOrder(true);
+        const startTime = Date.now();
+        console.log('Placing COD order...');
+        const result = await createCODOrder();
+        console.log('COD order result:', result);
+        
+        // Ensure loader shows for at least 2 seconds
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 2000 - elapsedTime);
+        
+        if (result && result.success) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+          await loadCart();
+          // Navigate to success page with order details
+          navigate('/order/success', {
+            state: {
+              orderId: result.order?._id || result.order?.id,
+              orderNumber: result.order?.orderNumber || null,
+            }
+          });
+        } else {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+          setProcessingOrder(false);
+          alert(result?.error || 'Failed to place COD order. Please try again.');
+        }
+        return;
+      }
+
+      // Handle Online Payment (Razorpay)
       if (!window.Razorpay) {
         await new Promise((resolve, reject) => {
           const s = document.createElement('script');
@@ -137,7 +171,16 @@ export default function AddressForm() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (e) {
-      alert('Unable to start payment');
+      setProcessingOrder(false);
+      const errorMessage = e?.message || e?.error || 'Unable to process payment. Please try again.';
+      console.error('Payment error details:', {
+        message: e?.message,
+        error: e?.error,
+        name: e?.name,
+        stack: e?.stack,
+        fullError: e
+      });
+      alert(errorMessage);
     }
   };
 
@@ -337,7 +380,32 @@ export default function AddressForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 p-4 relative">
+      {/* Loading Overlay */}
+      {processingOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center">
+            <div className="mb-6 flex justify-center">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-black"></div>
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {paymentMethod === 'cod' ? 'Placing Your Order...' : 'Processing Payment...'}
+            </h3>
+            <p className="text-gray-600 text-sm">
+              {paymentMethod === 'cod' 
+                ? 'Please wait while we process your order. This may take a few seconds.'
+                : 'Please wait while we process your payment.'}
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-2">
+              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           {showForm ? (
@@ -690,12 +758,61 @@ export default function AddressForm() {
               <span>₹{priceDetails.total.toLocaleString()}</span>
             </div>
 
+            {/* Payment Method Selection */}
+            <div className="mb-4 pb-4 border-b">
+              <h3 className="text-gray-500 text-sm font-medium mb-3">PAYMENT METHOD</h3>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="online"
+                    checked={paymentMethod === 'online'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-4 h-4 text-black focus:ring-black"
+                  />
+                  <div className="flex-1">
+                    <span className="text-sm font-medium text-gray-900">Online Payment</span>
+                    <p className="text-xs text-gray-500">Pay securely with Razorpay</p>
+                  </div>
+                </label>
+                <label className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cod"
+                    checked={paymentMethod === 'cod'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-4 h-4 text-black focus:ring-black"
+                  />
+                  <div className="flex-1">
+                    <span className="text-sm font-medium text-gray-900">Cash on Delivery</span>
+                    <p className="text-xs text-gray-500">Pay when you receive your order</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
             <button 
               onClick={handlePayment}
-              disabled={!hasSavedAddress}
-              className={`w-full mt-4 py-3 px-4 rounded-md transition-colors font-medium cursor-pointer ${hasSavedAddress ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+              disabled={!hasSavedAddress || processingOrder}
+              className={`w-full mt-4 py-3 px-4 rounded-md transition-colors font-medium ${
+                hasSavedAddress && !processingOrder 
+                  ? 'bg-black text-white hover:bg-gray-800 cursor-pointer' 
+                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
             >
-              PROCEED TO PAYMENT
+              {processingOrder ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {paymentMethod === 'cod' ? 'Placing Order...' : 'Processing...'}
+                </span>
+              ) : (
+                paymentMethod === 'cod' ? 'PLACE ORDER' : 'PROCEED TO PAYMENT'
+              )}
             </button>
           </div>
         </div>

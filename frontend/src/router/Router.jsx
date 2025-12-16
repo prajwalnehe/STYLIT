@@ -20,6 +20,7 @@ import { useEffect } from 'react';
 import Wishlist from '../pages/Wishlist';
 import AuthSuccess from '../pages/AuthSuccess';
 import AuthFailure from '../pages/AuthFailure';
+import OrderSuccess from '../pages/OrderSuccess';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminProducts from '../pages/admin/AdminProducts';
 import AdminOrders from '../pages/admin/AdminOrders';
@@ -113,6 +114,7 @@ const Router = () => {
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="auth/success" element={<AuthSuccess />} />
         <Route path="auth/failure" element={<AuthFailure />} />
+        <Route path="order/success" element={<OrderSuccess />} />
         {/* Admin routes */}
         <Route path="admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
           <Route index element={<AdminDashboard />} />
