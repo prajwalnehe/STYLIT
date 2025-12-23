@@ -88,7 +88,7 @@ const Footer = () => {
           <Link to="/" className="flex-shrink-0">
             <img 
               src="https://res.cloudinary.com/duc9svg7w/image/upload/v1765301725/Black_and_White_Bold_Line_Minimalist_Design_Studio_Logo_1_wfnkbf.png" 
-              alt="STYLEIT Logo" 
+              alt="SANSKRUTEE Logo" 
               className="h-28 md:h-36 lg:h-40 w-auto hover:scale-105 transition-transform duration-300 mb-3"
             />
           </Link>
@@ -183,7 +183,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-gray-700 pt-3 text-center">
           <p className="text-gray-300 text-xs mb-1">
-            © {currentYear} <span className="font-semibold text-white">STYLEIT</span>. All rights reserved.
+            © {currentYear} <span className="font-semibold text-white">SANSKRUTEE</span>. All rights reserved.
           </p>
           <p className="text-xs text-gray-400 mb-2">
             GSTIN: 27ABCDE1234F1Z5 | CIN: U74999MH2020PTC123456
