@@ -55,7 +55,13 @@ export const api = {
     listAddresses: () => request('/admin/addresses', { method: 'GET' }),
     updateOrderStatus: (id, status) => request(`/admin/orders/${id}`, { method: 'PATCH', body: JSON.stringify({ orderStatus: status }) }),
     updateOrder: (id, payload) => request(`/admin/orders/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+    // Policy endpoints
+    getPolicies: () => request('/admin/policies', { method: 'GET' }),
+    getPolicy: (type) => request(`/admin/policies/${type}`, { method: 'GET' }),
+    updatePolicy: (type, payload) => request(`/admin/policies/${type}`, { method: 'PUT', body: JSON.stringify(payload) }),
   },
+  // Public policy endpoint
+  getPolicy: (type) => request(`/policy/${type}`, { method: 'GET' }),
 };
 
 export default api;

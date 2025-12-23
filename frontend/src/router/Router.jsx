@@ -27,6 +27,7 @@ import AdminOrders from '../pages/admin/AdminOrders';
 import AdminLayout from '../pages/admin/AdminLayout';
 import AdminAddresses from '../pages/admin/AdminAddresses';
 import AdminOrderDetails from '../pages/admin/AdminOrderDetails';
+import AdminPolicies from '../pages/admin/AdminPolicies';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import TermsOfService from '../pages/TermsOfService';
 import ShippingPolicy from '../pages/ShippingPolicy';
@@ -131,6 +132,7 @@ const Router = () => {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="orders/:id" element={<AdminOrderDetails />} />
           <Route path="addresses" element={<AdminAddresses />} />
+          <Route path="policies" element={<AdminPolicies />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

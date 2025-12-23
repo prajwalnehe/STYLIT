@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { FiGrid, FiBox, FiShoppingBag, FiLogOut, FiSearch, FiUser, FiHome } from 'react-icons/fi';
+import { FiGrid, FiBox, FiShoppingBag, FiLogOut, FiSearch, FiUser, FiHome, FiBookOpen } from 'react-icons/fi';
 
 const Title = () => {
   const { pathname } = useLocation();
@@ -8,6 +8,7 @@ const Title = () => {
   if (pathname.startsWith('/admin/products')) return 'Products';
   if (pathname.startsWith('/admin/orders')) return 'Orders';
   if (pathname.startsWith('/admin/addresses')) return 'Addresses';
+  if (pathname.startsWith('/admin/policies')) return 'Policies';
   return 'Admin';
 };
 
@@ -50,6 +51,7 @@ const AdminLayout = () => {
           {navItem('/admin/products', 'Products', FiBox)}
           {navItem('/admin/orders', 'Orders', FiShoppingBag)}
           {navItem('/admin/addresses', 'Addresses', FiHome)}
+          {navItem('/admin/policies', 'Policies', FiBookOpen)}
           <button
             onClick={logout}
             className="mt-auto flex items-center gap-3 px-4 py-2 rounded-md text-blue-100 hover:bg-white/10 hover:text-white"

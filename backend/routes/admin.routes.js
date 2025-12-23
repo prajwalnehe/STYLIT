@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import auth from '../middleware/auth.js';
 import adminOnly from '../middleware/admin.js';
-import { createProduct, adminListProducts, deleteProductById, adminListOrders, adminStats, adminListAddresses, updateProduct, updateOrderStatus, adminGetOrderById } from '../controllers/admin.controller.js';
+import { createProduct, adminListProducts, deleteProductById, adminListOrders, adminStats, adminListAddresses, updateProduct, updateOrderStatus, adminGetOrderById, getPolicy, getAllPolicies, updatePolicy } from '../controllers/admin.controller.js';
 
 const router = Router();
 
@@ -23,5 +23,11 @@ router.get('/stats', auth, adminOnly, adminStats);
 
 // Addresses
 router.get('/addresses', auth, adminOnly, adminListAddresses);
+
+// Policies
+router.get('/policies', auth, adminOnly, getAllPolicies);
+router.get('/policies/:type', auth, adminOnly, getPolicy);
+router.put('/policies/:type', auth, adminOnly, updatePolicy);
+router.patch('/policies/:type', auth, adminOnly, updatePolicy);
 
 export default router;

@@ -1,6 +1,7 @@
 import { Product } from '../models/product.js';
 import Order from '../models/Order.js';
 import { Address } from '../models/Address.js';
+import { Policy } from '../models/Policy.js';
 
 const ORDER_STATUS_ALLOWED = new Set(['pending','confirmed','packed','shipped','delivered','cancelled','returned','created','on_the_way']);
 const PAYMENT_STATUS_ALLOWED = new Set(['paid','pending','failed','refunded']);
@@ -294,5 +295,71 @@ export async function updateProduct(req, res) {
     return res.json(product);
   } catch (err) {
     return res.status(500).json({ message: 'Failed to update product', error: err.message });
+  }
+}
+
+// Policy management functions
+export async function getPolicy(req, res) {
+  try {
+    const { type } = req.params;
+    const allowedTypes = ['privacy', 'terms', 'shipping', 'returns'];
+    
+    if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ message: 'Invalid policy type' });
+    }
+
+    const policy = await Policy.findOne({ type: type.toLowerCase() });
+    
+    if (!policy) {
+      return res.status(404).json({ message: 'Policy not found' });
+    }
+
+    return res.json(policy);
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to fetch policy', error: err.message });
+  }
+}
+
+export async function getAllPolicies(req, res) {
+  try {
+    const policies = await Policy.find({}).sort({ type: 1 });
+    return res.json(policies);
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to fetch policies', error: err.message });
+  }
+}
+
+export async function updatePolicy(req, res) {
+  try {
+    const { type } = req.params;
+    const { title, content } = req.body;
+    
+    const allowedTypes = ['privacy', 'terms', 'shipping', 'returns'];
+    
+    if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ message: 'Invalid policy type' });
+    }
+
+    if (!title || !content) {
+      return res.status(400).json({ message: 'Title and content are required' });
+    }
+
+    const policy = await Policy.findOneAndUpdate(
+      { type: type.toLowerCase() },
+      { 
+        title, 
+        content, 
+        lastUpdated: new Date() 
+      },
+      { 
+        new: true, 
+        upsert: true, 
+        runValidators: true 
+      }
+    );
+
+    return res.json(policy);
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to update policy', error: err.message });
   }
 }
