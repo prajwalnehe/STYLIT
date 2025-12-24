@@ -59,9 +59,14 @@ export const api = {
     getPolicies: () => request('/admin/policies', { method: 'GET' }),
     getPolicy: (type) => request(`/admin/policies/${type}`, { method: 'GET' }),
     updatePolicy: (type, payload) => request(`/admin/policies/${type}`, { method: 'PUT', body: JSON.stringify(payload) }),
+    // Logo endpoints
+    getLogo: () => request('/admin/logo', { method: 'GET' }),
+    updateLogo: (payload) => request('/admin/logo', { method: 'PUT', body: JSON.stringify(payload) }),
   },
   // Public policy endpoint
   getPolicy: (type) => request(`/policy/${type}`, { method: 'GET' }),
+  // Public settings endpoint
+  getLogo: () => request('/settings/logo', { method: 'GET' }),
 };
 
 export default api;

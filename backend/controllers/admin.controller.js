@@ -2,6 +2,7 @@ import { Product } from '../models/product.js';
 import Order from '../models/Order.js';
 import { Address } from '../models/Address.js';
 import { Policy } from '../models/Policy.js';
+import Settings from '../models/Settings.js';
 
 const ORDER_STATUS_ALLOWED = new Set(['pending','confirmed','packed','shipped','delivered','cancelled','returned','created','on_the_way']);
 const PAYMENT_STATUS_ALLOWED = new Set(['paid','pending','failed','refunded']);
@@ -361,5 +362,66 @@ export async function updatePolicy(req, res) {
     return res.json(policy);
   } catch (err) {
     return res.status(500).json({ message: 'Failed to update policy', error: err.message });
+  }
+}
+
+// Logo/Settings management functions
+export async function getLogo(req, res) {
+  try {
+    const navbarLogo = await Settings.findOne({ key: 'navbar_logo' });
+    const footerLogo = await Settings.findOne({ key: 'footer_logo' });
+    
+    return res.json({
+      navbarLogo: navbarLogo?.value || 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1766485714/Untitled_design_gpc5ty.svg',
+      footerLogo: footerLogo?.value || 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765301725/Black_and_White_Bold_Line_Minimalist_Design_Studio_Logo_1_wfnkbf.png'
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to fetch logo settings', error: err.message });
+  }
+}
+
+export async function updateLogo(req, res) {
+  try {
+    const { navbarLogo, footerLogo } = req.body;
+    
+    if (!navbarLogo && !footerLogo) {
+      return res.status(400).json({ message: 'At least one logo URL is required' });
+    }
+
+    const updates = [];
+    
+    if (navbarLogo) {
+      const navbarSetting = await Settings.findOneAndUpdate(
+        { key: 'navbar_logo' },
+        { 
+          key: 'navbar_logo',
+          value: navbarLogo,
+          description: 'Logo displayed in the navigation bar'
+        },
+        { new: true, upsert: true, runValidators: true }
+      );
+      updates.push(navbarSetting);
+    }
+    
+    if (footerLogo) {
+      const footerSetting = await Settings.findOneAndUpdate(
+        { key: 'footer_logo' },
+        { 
+          key: 'footer_logo',
+          value: footerLogo,
+          description: 'Logo displayed in the footer'
+        },
+        { new: true, upsert: true, runValidators: true }
+      );
+      updates.push(footerSetting);
+    }
+
+    return res.json({ 
+      message: 'Logo updated successfully',
+      navbarLogo: updates.find(s => s.key === 'navbar_logo')?.value,
+      footerLogo: updates.find(s => s.key === 'footer_logo')?.value
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to update logo', error: err.message });
   }
 }

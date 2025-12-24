@@ -1,7 +1,25 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { api } from '../utils/api';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [footerLogo, setFooterLogo] = useState('https://res.cloudinary.com/duc9svg7w/image/upload/v1765301725/Black_and_White_Bold_Line_Minimalist_Design_Studio_Logo_1_wfnkbf.png');
+
+  useEffect(() => {
+    const loadLogo = async () => {
+      try {
+        const data = await api.getLogo();
+        if (data.footerLogo) {
+          setFooterLogo(data.footerLogo);
+        }
+      } catch (err) {
+        console.error('Failed to load footer logo:', err);
+        // Keep default logo on error
+      }
+    };
+    loadLogo();
+  }, []);
 
   const quickLinks = [
     { name: 'HOME', path: '/' },
@@ -87,7 +105,7 @@ const Footer = () => {
             {/* Logo/Brand */}
           <Link to="/" className="flex-shrink-0">
             <img 
-              src="https://res.cloudinary.com/duc9svg7w/image/upload/v1765301725/Black_and_White_Bold_Line_Minimalist_Design_Studio_Logo_1_wfnkbf.png" 
+              src={footerLogo} 
               alt="SANSKRUTEE Logo" 
               className="h-28 md:h-36 lg:h-40 w-auto hover:scale-105 transition-transform duration-300 mb-3"
             />

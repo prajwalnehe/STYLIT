@@ -13,6 +13,7 @@ import addressRoutes from './routes/address.routes.js';
 import ordersRoutes from './routes/orders.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import policyRoutes from './routes/policy.routes.js';
+import settingsRoutes from './routes/settings.routes.js';
 
 import connectDB from './config/DataBaseConnection.js';
 import cookieJwtAuth from './middleware/authMiddleware.js';
@@ -65,6 +66,7 @@ server.use('/api/address', addressRoutes);
 server.use('/api/orders', ordersRoutes);
 server.use('/api/admin', adminRoutes);
 server.use('/api/policy', policyRoutes);
+server.use('/api/settings', settingsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

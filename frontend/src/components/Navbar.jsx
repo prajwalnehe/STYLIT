@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { searchProducts } from '../services/api';
+import { api } from '../utils/api';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,6 +17,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { cartCount } = useCart();
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [navbarLogo, setNavbarLogo] = useState('https://res.cloudinary.com/dvkxgrcbv/image/upload/v1766485714/Untitled_design_gpc5ty.svg');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,6 +69,21 @@ const Navbar = () => {
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  useEffect(() => {
+    const loadLogo = async () => {
+      try {
+        const data = await api.getLogo();
+        if (data.navbarLogo) {
+          setNavbarLogo(data.navbarLogo);
+        }
+      } catch (err) {
+        console.error('Failed to load navbar logo:', err);
+        // Keep default logo on error
+      }
+    };
+    loadLogo();
   }, []);
 
   const handleLogout = () => {
@@ -183,7 +200,7 @@ const Navbar = () => {
           {/* Logo/Brand */}
           <Link to="/" className="flex-shrink-0 z-10">
             <img 
-              src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1766485714/Untitled_design_gpc5ty.svg" 
+              src={navbarLogo} 
               alt="SANSKRUTEE Logo" 
               className="h-30 sm:h-40 md:h-40 lg:h-50 w-auto object-contain"
             />
