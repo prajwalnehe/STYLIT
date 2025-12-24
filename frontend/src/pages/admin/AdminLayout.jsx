@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { FiGrid, FiBox, FiShoppingBag, FiLogOut, FiSearch, FiUser, FiHome, FiBookOpen, FiImage } from 'react-icons/fi';
+import { FiGrid, FiBox, FiShoppingBag, FiLogOut, FiSearch, FiUser, FiHome, FiBookOpen, FiImage, FiSliders } from 'react-icons/fi';
 
 const Title = () => {
   const { pathname } = useLocation();
@@ -10,6 +10,7 @@ const Title = () => {
   if (pathname.startsWith('/admin/addresses')) return 'Addresses';
   if (pathname.startsWith('/admin/policies')) return 'Policies';
   if (pathname.startsWith('/admin/logo')) return 'Logo Settings';
+  if (pathname.startsWith('/admin/hero-slider')) return 'Hero Slider';
   return 'Admin';
 };
 
@@ -54,6 +55,7 @@ const AdminLayout = () => {
           {navItem('/admin/addresses', 'Addresses', FiHome)}
           {navItem('/admin/policies', 'Policies', FiBookOpen)}
           {navItem('/admin/logo', 'Logo Settings', FiImage)}
+          {navItem('/admin/hero-slider', 'Hero Slider', FiSliders)}
           <button
             onClick={logout}
             className="mt-auto flex items-center gap-3 px-4 py-2 rounded-md text-blue-100 hover:bg-white/10 hover:text-white"
@@ -74,6 +76,7 @@ const AdminLayout = () => {
               {navItem('/admin/addresses', 'Addresses', FiHome)}
               {navItem('/admin/policies', 'Policies', FiBookOpen)}
               {navItem('/admin/logo', 'Logo Settings', FiImage)}
+              {navItem('/admin/hero-slider', 'Hero Slider', FiSliders)}
               <button
                 onClick={logout}
                 className="mt-auto flex items-center gap-3 px-4 py-2 rounded-md text-blue-100 hover:bg-white/10 hover:text-white"

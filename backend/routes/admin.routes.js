@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import auth from '../middleware/auth.js';
 import adminOnly from '../middleware/admin.js';
-import { createProduct, adminListProducts, deleteProductById, adminListOrders, adminStats, adminListAddresses, updateProduct, updateOrderStatus, adminGetOrderById, getPolicy, getAllPolicies, updatePolicy, getLogo, updateLogo } from '../controllers/admin.controller.js';
+import { createProduct, adminListProducts, deleteProductById, adminListOrders, adminStats, adminListAddresses, updateProduct, updateOrderStatus, adminGetOrderById, getPolicy, getAllPolicies, updatePolicy, getLogo, updateLogo, getHeroSlider, updateHeroSlider } from '../controllers/admin.controller.js';
 
 const router = Router();
 
@@ -34,5 +34,10 @@ router.patch('/policies/:type', auth, adminOnly, updatePolicy);
 router.get('/logo', auth, adminOnly, getLogo);
 router.put('/logo', auth, adminOnly, updateLogo);
 router.patch('/logo', auth, adminOnly, updateLogo);
+
+// Hero Slider
+router.get('/hero-slider', auth, adminOnly, getHeroSlider);
+router.put('/hero-slider', auth, adminOnly, updateHeroSlider);
+router.patch('/hero-slider', auth, adminOnly, updateHeroSlider);
 
 export default router;

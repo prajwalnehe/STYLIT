@@ -1,38 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MobileBottomNav from '../components/MobileBottomNav';
 import HeroSlider from '../components/HeroSlider';
+import { api } from '../utils/api';
 
 // Import new components you'd need to create for a full landing page
 import FeaturedProducts from '../components/FeaturedProducts'; 
 import CategoryShowcase from '../components/CategoryShowcase';
 
 const Home = () => {
+  const [heroSliderData, setHeroSliderData] = useState({
+    slides: [
+      {
+        desktop: "https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Blue_and_White_Modern_Fashion_Store_Banner_2048_x_594_px_ga4muy.png",
+        alt: 'TickNTrack - Premium Shoes & Watches Collection',
+      },
+      {
+        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299330/Bone_Pink_Luxury_Premium_Isolated_Parfum_Banner_Landscape_2048_x_594_px_jqytrt.png',
+        alt: 'Festive Offer - TickNTrack',
+      },
+      {
+        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Brown_White_Modern_Fashion_Banner_2048_x_594_px_kfx9s8.png',
+        alt: 'Festive Offer - TickNTrack',
+      },
+      {
+        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765304356/White_Fashion_Shoes_For_Men_Themes_Facebook_Cover_2048_x_594_px_ihwivu.png',
+        alt: 'Festive Offer - TickNTrack',
+      },
+    ],
+    mobileSrc: "https://res.cloudinary.com/duc9svg7w/image/upload/v1765299343/Brown_Minimalist_Lifestyle_Fashion_Instagram_Post_1080_x_1080_px_yi1bzg.png"
+  });
+
+  useEffect(() => {
+    const loadHeroSlider = async () => {
+      try {
+        const data = await api.getHeroSlider();
+        if (data && data.slides && data.slides.length > 0) {
+          setHeroSliderData({
+            slides: data.slides,
+            mobileSrc: data.mobileSrc || data.slides[0]?.desktop || ''
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load hero slider:', err);
+        // Keep default banners on error
+      }
+    };
+    loadHeroSlider();
+  }, []);
+
   return (
     // Added a container with padding for visual balance
     <div className="min-h-screen pt-0 pb-16 md:pb-0 mt-0 bg-gray-50">
       
       {/* 1. Hero Slider/Banner - Primary Visual & CTA */}
       <HeroSlider
-        slides={[
-          {
-            desktop: "https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Blue_and_White_Modern_Fashion_Store_Banner_2048_x_594_px_ga4muy.png",
-            alt: 'TickNTrack - Premium Shoes & Watches Collection',
-          },
-          {
-            desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299330/Bone_Pink_Luxury_Premium_Isolated_Parfum_Banner_Landscape_2048_x_594_px_jqytrt.png',
-            alt: 'Festive Offer - TickNTrack',
-          },
-          {
-            desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Brown_White_Modern_Fashion_Banner_2048_x_594_px_kfx9s8.png',
-            alt: 'Festive Offer - TickNTrack',
-          },
-          {
-            desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765304356/White_Fashion_Shoes_For_Men_Themes_Facebook_Cover_2048_x_594_px_ihwivu.png',
-            alt: 'Festive Offer - TickNTrack',
-          },
-        ]}
-        mobileSrc="https://res.cloudinary.com/duc9svg7w/image/upload/v1765299343/Brown_Minimalist_Lifestyle_Fashion_Instagram_Post_1080_x_1080_px_yi1bzg.png"
+        slides={heroSliderData.slides}
+        mobileSrc={heroSliderData.mobileSrc}
       />
       
       {/* Main Content Area */}

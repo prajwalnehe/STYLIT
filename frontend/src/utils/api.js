@@ -62,11 +62,16 @@ export const api = {
     // Logo endpoints
     getLogo: () => request('/admin/logo', { method: 'GET' }),
     updateLogo: (payload) => request('/admin/logo', { method: 'PUT', body: JSON.stringify(payload) }),
+    // Hero Slider endpoints
+    getHeroSlider: () => request('/admin/hero-slider', { method: 'GET' }),
+    updateHeroSlider: (payload) => request('/admin/hero-slider', { method: 'PUT', body: JSON.stringify(payload) }),
   },
   // Public policy endpoint
   getPolicy: (type) => request(`/policy/${type}`, { method: 'GET' }),
   // Public settings endpoint
   getLogo: () => request('/settings/logo', { method: 'GET' }),
+  // Public hero slider endpoint
+  getHeroSlider: () => request('/settings/hero-slider', { method: 'GET' }),
 };
 
 export default api;

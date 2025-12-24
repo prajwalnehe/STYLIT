@@ -425,3 +425,96 @@ export async function updateLogo(req, res) {
     return res.status(500).json({ message: 'Failed to update logo', error: err.message });
   }
 }
+
+// Hero Slider management functions
+export async function getHeroSlider(req, res) {
+  try {
+    const heroSliderSetting = await Settings.findOne({ key: 'hero_slider' });
+    
+    // Default banners if none exist
+    const defaultSlides = [
+      {
+        desktop: "https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Blue_and_White_Modern_Fashion_Store_Banner_2048_x_594_px_ga4muy.png",
+        alt: 'TickNTrack - Premium Shoes & Watches Collection',
+      },
+      {
+        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299330/Bone_Pink_Luxury_Premium_Isolated_Parfum_Banner_Landscape_2048_x_594_px_jqytrt.png',
+        alt: 'Festive Offer - TickNTrack',
+      },
+      {
+        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Brown_White_Modern_Fashion_Banner_2048_x_594_px_kfx9s8.png',
+        alt: 'Festive Offer - TickNTrack',
+      },
+      {
+        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765304356/White_Fashion_Shoes_For_Men_Themes_Facebook_Cover_2048_x_594_px_ihwivu.png',
+        alt: 'Festive Offer - TickNTrack',
+      },
+    ];
+    const defaultMobileSrc = 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299343/Brown_Minimalist_Lifestyle_Fashion_Instagram_Post_1080_x_1080_px_yi1bzg.png';
+    
+    if (!heroSliderSetting || !heroSliderSetting.value) {
+      return res.json({
+        slides: defaultSlides,
+        mobileSrc: defaultMobileSrc
+      });
+    }
+    
+    try {
+      const parsed = JSON.parse(heroSliderSetting.value);
+      return res.json({
+        slides: parsed.slides || defaultSlides,
+        mobileSrc: parsed.mobileSrc || defaultMobileSrc
+      });
+    } catch {
+      return res.json({
+        slides: defaultSlides,
+        mobileSrc: defaultMobileSrc
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to fetch hero slider settings', error: err.message });
+  }
+}
+
+export async function updateHeroSlider(req, res) {
+  try {
+    const { slides, mobileSrc } = req.body;
+    
+    if (!slides || !Array.isArray(slides) || slides.length === 0) {
+      return res.status(400).json({ message: 'Slides array is required and must not be empty' });
+    }
+
+    // Validate slides structure
+    for (const slide of slides) {
+      if (!slide.desktop || typeof slide.desktop !== 'string') {
+        return res.status(400).json({ message: 'Each slide must have a desktop URL' });
+      }
+    }
+
+    const value = JSON.stringify({
+      slides: slides.map(s => ({
+        desktop: s.desktop,
+        alt: s.alt || `Banner ${slides.indexOf(s) + 1}`
+      })),
+      mobileSrc: mobileSrc || slides[0]?.desktop || ''
+    });
+
+    const heroSliderSetting = await Settings.findOneAndUpdate(
+      { key: 'hero_slider' },
+      { 
+        key: 'hero_slider',
+        value: value,
+        description: 'Hero slider banners for homepage'
+      },
+      { new: true, upsert: true, runValidators: true }
+    );
+
+    return res.json({ 
+      message: 'Hero slider updated successfully',
+      slides: JSON.parse(heroSliderSetting.value).slides,
+      mobileSrc: JSON.parse(heroSliderSetting.value).mobileSrc
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to update hero slider', error: err.message });
+  }
+}
