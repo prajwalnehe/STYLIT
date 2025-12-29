@@ -244,12 +244,22 @@ export async function adminGetOrderById(req, res) {
 
 export async function adminStats(req, res) {
   try {
+    // Calculate revenue from delivered orders (using orderStatus field if available, fallback to status)
     const [revenueAgg] = await Order.aggregate([
-      { $match: { status: 'paid' } },
+      { 
+        $match: { 
+          $or: [
+            { orderStatus: 'delivered' },
+            { status: 'delivered' }
+          ]
+        } 
+      },
       { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } },
     ]);
     const totalRevenue = revenueAgg?.total || 0;
-    const totalOrders = revenueAgg?.count || 0;
+    
+    // Count all orders (not just delivered)
+    const totalOrders = await Order.countDocuments();
     const totalProducts = await Product.countDocuments();
     return res.json({ totalRevenue, totalOrders, totalProducts });
   } catch (err) {

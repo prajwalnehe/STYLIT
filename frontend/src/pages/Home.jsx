@@ -11,22 +11,22 @@ import CategoryShowcase from '../components/CategoryShowcase';
 const Home = () => {
   const [heroSliderData, setHeroSliderData] = useState({
     slides: [
-      {
-        desktop: "https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Blue_and_White_Modern_Fashion_Store_Banner_2048_x_594_px_ga4muy.png",
-        alt: 'TickNTrack - Premium Shoes & Watches Collection',
-      },
-      {
-        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299330/Bone_Pink_Luxury_Premium_Isolated_Parfum_Banner_Landscape_2048_x_594_px_jqytrt.png',
-        alt: 'Festive Offer - TickNTrack',
-      },
-      {
-        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Brown_White_Modern_Fashion_Banner_2048_x_594_px_kfx9s8.png',
-        alt: 'Festive Offer - TickNTrack',
-      },
-      {
-        desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765304356/White_Fashion_Shoes_For_Men_Themes_Facebook_Cover_2048_x_594_px_ihwivu.png',
-        alt: 'Festive Offer - TickNTrack',
-      },
+          {
+            desktop: "https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Blue_and_White_Modern_Fashion_Store_Banner_2048_x_594_px_ga4muy.png",
+            alt: 'TickNTrack - Premium Shoes & Watches Collection',
+          },
+          {
+            desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299330/Bone_Pink_Luxury_Premium_Isolated_Parfum_Banner_Landscape_2048_x_594_px_jqytrt.png',
+            alt: 'Festive Offer - TickNTrack',
+          },
+          {
+            desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765299332/Brown_White_Modern_Fashion_Banner_2048_x_594_px_kfx9s8.png',
+            alt: 'Festive Offer - TickNTrack',
+          },
+          {
+            desktop: 'https://res.cloudinary.com/duc9svg7w/image/upload/v1765304356/White_Fashion_Shoes_For_Men_Themes_Facebook_Cover_2048_x_594_px_ihwivu.png',
+            alt: 'Festive Offer - TickNTrack',
+          },
     ],
     mobileSrc: "https://res.cloudinary.com/duc9svg7w/image/upload/v1765299343/Brown_Minimalist_Lifestyle_Fashion_Instagram_Post_1080_x_1080_px_yi1bzg.png"
   });

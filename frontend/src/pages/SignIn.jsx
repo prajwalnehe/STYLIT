@@ -1,18 +1,36 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
+import { FiPhone } from 'react-icons/fi';
 
 const SignIn = () => {
+  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'otp'
+  
+  // Email/Password form data
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
+  // OTP form data
+  const [otpData, setOtpData] = useState({
+    mobile: '',
+    otp: '',
+  });
+
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(0);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleOtpChange = (e) => {
+    setOtpData({ ...otpData, [e.target.name]: e.target.value });
+  };
+
   const [loading, setLoading] = useState(false);
+  const [sendingOTP, setSendingOTP] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
@@ -40,6 +58,76 @@ const SignIn = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSendOTP = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    
+    // Validate mobile number
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!mobileRegex.test(otpData.mobile)) {
+      setError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    setSendingOTP(true);
+    try {
+      const resp = await api.sendOTP({ mobile: otpData.mobile });
+      setSuccess(resp.message || 'OTP sent successfully');
+      setOtpSent(true);
+      
+      // Start countdown timer (10 minutes = 600 seconds)
+      setOtpTimer(600);
+      const timerInterval = setInterval(() => {
+        setOtpTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      setError(err.message || 'Failed to send OTP');
+    } finally {
+      setSendingOTP(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      const resp = await api.verifyOTP({
+        mobile: otpData.mobile,
+        otp: otpData.otp,
+      });
+      
+      // Store token and redirect
+      if (resp?.token) localStorage.setItem('auth_token', resp.token);
+      if (resp?.user?.isAdmin) {
+        localStorage.setItem('auth_is_admin', 'true');
+      } else {
+        try { localStorage.removeItem('auth_is_admin'); } catch {}
+      }
+      const redirectTo = location.state?.from?.pathname || '/';
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      setError(err.message || 'Invalid OTP. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTimer = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -83,9 +171,50 @@ const SignIn = () => {
 
             {/* Sign In Form */}
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
-              {error && (<div className="mb-4 text-sm text-red-600">{error}</div>)}
-              {success && (<div className="mb-4 text-sm text-green-600">{success}</div>)}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Login Method Toggle */}
+              <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginMethod('email');
+                    setError('');
+                    setSuccess('');
+                    setOtpSent(false);
+                    setOtpTimer(0);
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                    loginMethod === 'email'
+                      ? 'bg-white text-rose-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Email & Password
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginMethod('otp');
+                    setError('');
+                    setSuccess('');
+                    setOtpSent(false);
+                    setOtpTimer(0);
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                    loginMethod === 'otp'
+                      ? 'bg-white text-rose-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Login with OTP
+                </button>
+              </div>
+
+              {error && (<div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>)}
+              {success && (<div className="mb-4 text-sm text-green-600 bg-green-50 p-3 rounded-lg">{success}</div>)}
+
+              {/* Email/Password Login Form */}
+              {loginMethod === 'email' && (
+                <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
                     Email Address
@@ -149,6 +278,105 @@ const SignIn = () => {
                   Continue as Guest
                 </button>
               </form>
+              )}
+
+              {/* OTP Login Form */}
+              {loginMethod === 'otp' && (
+                <div className="space-y-4">
+                  {!otpSent ? (
+                    <form onSubmit={handleSendOTP} className="space-y-4">
+                      <div>
+                        <label htmlFor="mobile" className="block text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+                          <FiPhone className="w-4 h-4" />
+                          Mobile Number
+                        </label>
+                        <input
+                          type="tel"
+                          id="mobile"
+                          name="mobile"
+                          value={otpData.mobile}
+                          onChange={handleOtpChange}
+                          required
+                          maxLength="10"
+                          className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all"
+                          placeholder="Enter 10-digit mobile number"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">We'll send you a 6-digit OTP</p>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={sendingOTP}
+                        className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
+                      >
+                        {sendingOTP ? 'Sending OTP...' : 'Send OTP'}
+                      </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleVerifyOTP} className="space-y-4">
+                      <div>
+                        <label htmlFor="mobile-display" className="block text-sm font-medium text-neutral-700 mb-2">
+                          Mobile Number
+                        </label>
+                        <div className="w-full px-3 py-2 border border-neutral-200 rounded-lg bg-gray-50 text-gray-600">
+                          +91 {otpData.mobile}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOtpSent(false);
+                            setOtpData({ ...otpData, otp: '' });
+                            setError('');
+                            setSuccess('');
+                          }}
+                          className="mt-1 text-xs text-rose-500 hover:text-rose-600"
+                        >
+                          Change number
+                        </button>
+                      </div>
+
+                      <div>
+                        <label htmlFor="otp" className="block text-sm font-medium text-neutral-700 mb-2">
+                          Enter OTP
+                        </label>
+                        <input
+                          type="text"
+                          id="otp"
+                          name="otp"
+                          value={otpData.otp}
+                          onChange={handleOtpChange}
+                          required
+                          maxLength="6"
+                          className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all text-center text-2xl tracking-widest"
+                          placeholder="000000"
+                        />
+                        {otpTimer > 0 && (
+                          <p className="mt-2 text-xs text-gray-500 text-center">
+                            OTP expires in: <span className="font-semibold text-rose-600">{formatTimer(otpTimer)}</span>
+                          </p>
+                        )}
+                        {otpTimer === 0 && otpSent && (
+                          <button
+                            type="button"
+                            onClick={handleSendOTP}
+                            className="mt-2 text-xs text-rose-500 hover:text-rose-600 font-medium"
+                          >
+                            Resend OTP
+                          </button>
+                        )}
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
+                      >
+                        {loading ? 'Verifying...' : 'Verify & Login'}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
 
               {/* Divider */}
               <div className="mt-6 mb-4">

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import passport from '../config/passport.js';
-import { signup, signin, forgotPassword, resetPassword } from '../controllers/auth.controller.js';
+import { signup, signin, forgotPassword, resetPassword, sendOTP, verifyOTP } from '../controllers/auth.controller.js';
 import auth from '../middleware/auth.js';
 import User from '../models/User.js';
 
@@ -11,6 +11,10 @@ router.post('/signup', signup);
 router.post('/signin', signin);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
+
+// OTP Login
+router.post('/send-otp', sendOTP);
+router.post('/verify-otp', verifyOTP);
 
 // Get current user profile
 router.get('/me', auth, async (req, res) => {
