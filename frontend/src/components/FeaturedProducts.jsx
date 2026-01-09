@@ -18,7 +18,18 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
       try {
         setLoading(true);
         // Pass empty string to fetch all products from all categories
-        const data = await fetchSarees(category || '');
+        const response = await fetchSarees(category || '');
+        
+        // Handle both old format (array) and new format (object with products and pagination)
+        let data = [];
+        if (Array.isArray(response)) {
+          data = response;
+        } else if (response.products) {
+          data = response.products;
+        } else {
+          data = response;
+        }
+        
         // Limit products for grid layout, show all for scroll layout
         const productList = isGridLayout ? (data || []).slice(0, maxProducts) : (data || []);
         setProducts(productList);

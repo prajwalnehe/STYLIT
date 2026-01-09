@@ -7,6 +7,7 @@ import { api } from '../utils/api';
 // Import new components you'd need to create for a full landing page
 import FeaturedProducts from '../components/FeaturedProducts'; 
 import CategoryShowcase from '../components/CategoryShowcase';
+import TrendingNow from '../components/TrendingNow';
 
 const Home = () => {
   const [heroSliderData, setHeroSliderData] = useState({
@@ -48,6 +49,7 @@ const Home = () => {
     };
     loadHeroSlider();
   }, []);
+
 
   return (
     // Added a container with padding for visual balance
@@ -105,6 +107,7 @@ const Home = () => {
               src="https://res.cloudinary.com/duc9svg7w/image/upload/v1765303741/Minimalist_Elegant_New_Perfume_Collection_Facebook_Ad_nqbrm8.png"
               alt="Special Offer Banner"
               className="w-full h-auto object-cover rounded-lg shadow-md"
+              style={{ maxHeight: '350px', objectFit: 'cover' }}
             />
           </div>
         </section>
@@ -151,6 +154,9 @@ const Home = () => {
         {/* You could add more sections here like Testimonials, Instagram Feed, or Brand Story */}
         
       </main>
+
+      {/* Trending Now Section */}
+      <TrendingNow />
 
       {/* 5. Mobile Bottom Navigation - Kept at the bottom for mobile UX */}
       <MobileBottomNav />

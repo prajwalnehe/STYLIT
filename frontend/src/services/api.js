@@ -2,13 +2,35 @@
 const API_BASE = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:7000').replace(/\/$/, '');
 const API_URL = `${API_BASE}/api`;
 
-export const fetchSarees = async (category) => {
+export const fetchSarees = async (category, options = {}) => {
   try {
-    const response = await fetch(`${API_URL}/products${category ? `?category=${encodeURIComponent(category)}` : ''}`);
+    const { page, limit } = options;
+    const params = new URLSearchParams();
+    
+    if (category) {
+      params.append('category', category);
+    }
+    if (page) {
+      params.append('page', page.toString());
+    }
+    if (limit) {
+      params.append('limit', limit.toString());
+    }
+    
+    const queryString = params.toString();
+    const url = `${API_URL}/products${queryString ? `?${queryString}` : ''}`;
+    
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error('Failed to fetch sarees');
     }
-    return await response.json();
+    const data = await response.json();
+    
+    // Handle both old format (array) and new format (object with products and pagination)
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data;
   } catch (error) {
     console.error('Error fetching sarees:', error);
     throw error;
