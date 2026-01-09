@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FaRupeeSign, FaSpinner, FaFilter, FaTimes, FaHeart } from 'react-icons/fa';
+import { FaRupeeSign, FaSpinner, FaFilter, FaTimes, FaHeart, FaRegHeart } from 'react-icons/fa';
 // import { IoEyeOutline } from 'react-icons/io5'; // IoEyeOutline is imported but not used, can be removed if not needed later
 
 // --- IMPORTANT: This line is now the intended data source. Ensure 'fetchSarees' is available. ---
@@ -610,15 +610,13 @@ const ProductList = ({ defaultCategory } = {}) => {
                                                 {/* Heart Icon - Top Right (Always Visible) */}
                                                 <button 
                                                     onClick={(e) => toggleWishlist(p, e)} 
-                                                    className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1 sm:p-1.5 md:p-2 bg-white/95 hover:bg-white rounded-full transition-all duration-200 z-10 shadow-sm"
+                                                    className="absolute top-2 right-2 md:top-3 md:right-3 bg-white rounded-full p-1 md:p-2 shadow-sm hover:shadow-md transition-all z-10"
                                                 >
-                                                    <FaHeart 
-                                                        className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors ${
-                                                            wishlisted 
-                                                                ? 'text-pink-500' 
-                                                                : 'text-gray-700 hover:text-pink-500'
-                                                        }`} 
-                                                    />
+                                                    {wishlisted ? (
+                                                        <FaHeart className="text-red-500 w-3 h-3 md:w-4 md:h-4" />
+                                                    ) : (
+                                                        <FaRegHeart className="text-gray-700 w-3 h-3 md:w-4 md:h-4" />
+                                                    )}
                                                 </button>
 
                                                 {/* Discount Badge - Bottom Left (if applicable) */}

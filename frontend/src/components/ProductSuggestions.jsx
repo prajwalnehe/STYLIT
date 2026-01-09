@@ -160,14 +160,14 @@ const ProductSuggestions = ({ currentProductId, category, maxProducts = 8 }) => 
                   
                   {/* Wishlist Icon */}
                   <button
-                    className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 sm:p-2 bg-white/80 rounded-full hover:bg-white text-gray-700 transition-colors duration-200 z-10"
                     onClick={(e) => handleWishlistToggle(e, product)}
+                    className="absolute top-2 right-2 md:top-3 md:right-3 bg-white rounded-full p-1 md:p-2 shadow-sm hover:shadow-md transition-all z-10"
                     aria-label={isWishlisted(productId) ? 'Remove from wishlist' : 'Add to wishlist'}
                   >
                     {isWishlisted(productId) ? (
-                      <FaHeart className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                      <FaHeart className="text-red-500 w-3 h-3 md:w-4 md:h-4" />
                     ) : (
-                      <FaRegHeart className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <FaRegHeart className="text-gray-700 w-3 h-3 md:w-4 md:h-4" />
                     )}
                   </button>
                   

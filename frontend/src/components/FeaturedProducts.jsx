@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 // FaHeart is used for the favorite icon seen in the top right of the cards
-import { FaHeart, FaStar, FaChevronLeft, FaChevronRight, FaSpinner } from 'react-icons/fa'; 
+import { FaHeart, FaRegHeart, FaStar, FaChevronLeft, FaChevronRight, FaSpinner } from 'react-icons/fa'; 
 import { fetchSarees } from '../services/api';
 import { getCachedProducts, setCachedProducts } from '../utils/cache';
 
@@ -9,6 +9,7 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadedFromCache, setLoadedFromCache] = useState(false);
+  const [wishlist, setWishlist] = useState([]);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -20,6 +21,20 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
     const cat = category || 'all';
     return `featured_products_cache_${cat}`;
   };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('wishlist');
+      if (saved) {
+        const items = JSON.parse(saved);
+        // Extract product IDs if items are objects, or use as-is if array of IDs
+        const ids = Array.isArray(items) ? items.map(item => typeof item === 'object' ? item._id : item).filter(Boolean) : [];
+        setWishlist(ids);
+      }
+    } catch (e) {
+      console.error('Error loading wishlist:', e);
+    }
+  }, []);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -146,6 +161,57 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
     }
   };
 
+  const toggleWishlist = (productId, e) => {
+    e.stopPropagation();
+    try {
+      const saved = localStorage.getItem('wishlist');
+      let items = saved ? JSON.parse(saved) : [];
+      
+      // Check if product is already in wishlist (handle both ID arrays and object arrays)
+      const isInWishlist = items.some(item => {
+        if (typeof item === 'object') {
+          return item._id === productId;
+        }
+        return item === productId;
+      });
+      
+      if (isInWishlist) {
+        items = items.filter(item => {
+          if (typeof item === 'object') {
+            return item._id !== productId;
+          }
+          return item !== productId;
+        });
+      } else {
+        // Find the product to add full details
+        const product = products.find(p => (p._id || p.id) === productId);
+        if (product) {
+          items.push({
+            _id: productId,
+            title: product.title || product.name,
+            images: product.images,
+            price: product.price || product.mrp || 0,
+            mrp: product.mrp,
+            discountPercent: product.discountPercent || 0,
+          });
+        } else {
+          items.push(productId);
+        }
+      }
+      
+      localStorage.setItem('wishlist', JSON.stringify(items));
+      const ids = items.map(item => typeof item === 'object' ? item._id : item).filter(Boolean);
+      setWishlist(ids);
+      
+      // Dispatch event for other components
+      try { 
+        window.dispatchEvent(new Event('wishlist:updated')); 
+      } catch {}
+    } catch (e) {
+      console.error('Error updating wishlist:', e);
+    }
+  };
+
   if (loading) {
     return (
       <section className="py-8 bg-white">
@@ -191,13 +257,14 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
                   
                   {/* Heart Icon (Top Right) */}
                   <button 
-                    className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1 sm:p-1.5 md:p-2 bg-white/70 rounded-full hover:bg-white text-gray-700 transition-colors duration-200 z-10"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Handle wishlist logic here
-                    }}
+                    onClick={(e) => toggleWishlist(product._id || product.id, e)}
+                    className="absolute top-2 right-2 md:top-3 md:right-3 bg-white rounded-full p-1 md:p-2 shadow-sm hover:shadow-md transition-all z-10"
                   >
-                    <FaHeart className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                    {wishlist.includes(product._id || product.id) ? (
+                      <FaHeart className="text-red-500 w-3 h-3 md:w-4 md:h-4" />
+                    ) : (
+                      <FaRegHeart className="text-gray-700 w-3 h-3 md:w-4 md:h-4" />
+                    )}
                   </button>
                 </div>
                 
@@ -282,13 +349,14 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
                 
                 {/* Heart Icon (Top Right) */}
                 <button 
-                  className="absolute top-2 right-2 p-2 bg-white/70 rounded-full hover:bg-white text-gray-700 transition-colors duration-200 z-10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Handle wishlist logic here
-                  }}
+                  onClick={(e) => toggleWishlist(product._id || product.id, e)}
+                  className="absolute top-2 right-2 md:top-3 md:right-3 bg-white rounded-full p-1 md:p-2 shadow-sm hover:shadow-md transition-all z-10"
                 >
-                  <FaHeart className="w-4 h-4" />
+                  {wishlist.includes(product._id || product.id) ? (
+                    <FaHeart className="text-red-500 w-3 h-3 md:w-4 md:h-4" />
+                  ) : (
+                    <FaRegHeart className="text-gray-700 w-3 h-3 md:w-4 md:h-4" />
+                  )}
                 </button>
               </div>
               
