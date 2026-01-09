@@ -137,7 +137,7 @@ const ProductDetail = () => {
       <div className="text-center py-12">
         <p className="text-gray-600">Product not found</p>
         <button
-          onClick={() => navigate('/shop')}
+          onClick={() => navigate('/')}
           className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
         >
           Browse Products

@@ -5,8 +5,8 @@ import { fetchSarees } from '../services/api';
 import { getCachedProducts, setCachedProducts } from '../utils/cache';
 
 const TrendingNow = () => {
-  const [allProducts, setAllProducts] = useState([]); // Store all products
-  const [displayedProducts, setDisplayedProducts] = useState([]); // Products to display
+  const [allProducts, setAllProducts] = useState([]);
+  const [displayedProducts, setDisplayedProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -15,21 +15,18 @@ const TrendingNow = () => {
   const sectionRef = useRef(null);
   const navigate = useNavigate();
 
-  const PRODUCTS_PER_PAGE = 20; // Load 20 products at a time
+  const PRODUCTS_PER_PAGE = 20;
   const CACHE_KEY = 'trending_products_cache';
 
-  // Load initial products
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
         setLoadedFromCache(false);
 
-        // Check cache first
         const cachedProducts = await getCachedProducts(CACHE_KEY);
         
         if (cachedProducts && cachedProducts.length > 0) {
-          // Use cached data
           const availableProducts = cachedProducts.filter(p => p.images?.image1);
           setAllProducts(availableProducts);
           setDisplayedProducts(availableProducts.slice(0, PRODUCTS_PER_PAGE));
@@ -37,26 +34,20 @@ const TrendingNow = () => {
           setLoadedFromCache(true);
           setLoading(false);
           
-          // Hide cache message after 3 seconds
           setTimeout(() => setLoadedFromCache(false), 3000);
           return;
         }
 
-        // No cache, fetch from API
         const data = await fetchSarees('');
-        // Filter products with images
         const availableProducts = data.filter(p => p.images?.image1);
         
-        // Cache the products
         await setCachedProducts(CACHE_KEY, availableProducts);
         
         setAllProducts(availableProducts);
-        // Display first batch
         setDisplayedProducts(availableProducts.slice(0, PRODUCTS_PER_PAGE));
         setHasMore(availableProducts.length > PRODUCTS_PER_PAGE);
       } catch (error) {
         console.error('Error loading trending products:', error);
-        // Try to use cache even if API fails
         const cachedProducts = await getCachedProducts(CACHE_KEY);
         if (cachedProducts && cachedProducts.length > 0) {
           const availableProducts = cachedProducts.filter(p => p.images?.image1);
@@ -73,7 +64,6 @@ const TrendingNow = () => {
 
     loadProducts();
     
-    // Load wishlist from localStorage
     try {
       const saved = localStorage.getItem('wishlist');
       if (saved) {
@@ -84,13 +74,11 @@ const TrendingNow = () => {
     }
   }, []);
 
-  // Load more products function
   const loadMoreProducts = useCallback(() => {
     if (loadingMore || !hasMore) return;
 
     setLoadingMore(true);
     
-    // Simulate slight delay for better UX
     setTimeout(() => {
       const currentCount = displayedProducts.length;
       const nextBatch = allProducts.slice(currentCount, currentCount + PRODUCTS_PER_PAGE);
@@ -106,7 +94,6 @@ const TrendingNow = () => {
     }, 300);
   }, [allProducts, displayedProducts.length, loadingMore, hasMore]);
 
-  // Scroll detection for infinite scroll
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current || loadingMore || !hasMore) return;
@@ -115,7 +102,6 @@ const TrendingNow = () => {
       const rect = section.getBoundingClientRect();
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
       
-      // Load more when user is 200px away from bottom of section
       if (rect.bottom <= windowHeight + 200) {
         loadMoreProducts();
       }
@@ -195,7 +181,6 @@ const TrendingNow = () => {
   return (
     <section ref={sectionRef} className="py-16 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-5xl md:text-6xl font-serif text-gray-800 mb-3 tracking-wide" style={{ fontFamily: 'serif' }}>
             Trending Now
@@ -203,16 +188,8 @@ const TrendingNow = () => {
           <p className="text-base md:text-lg text-gray-600 font-light italic">
             Serving looks, garma-garam!
           </p>
-          {/* Cache message */}
-          {loadedFromCache && (
-            <div className="mt-4 inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg text-sm animate-fade-in">
-              <FaSpinner className="text-green-600" />
-              <span>Loaded from cache</span>
-            </div>
-          )}
         </div>
 
-        {/* Product Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {displayedProducts.map((product) => {
             const price = calculatePrice(product);
@@ -226,7 +203,6 @@ const TrendingNow = () => {
                 className="group bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100"
                 onClick={() => handleProductClick(product)}
               >
-                {/* Image Container */}
                 <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
                   <img
                     src={product.images?.image1 || 'https://via.placeholder.com/300x400?text=Image+Not+Available'}
@@ -238,14 +214,12 @@ const TrendingNow = () => {
                     }}
                   />
                   
-                  {/* Sale Tag */}
                   {discount > 0 && (
                     <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-red-600 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 md:px-2.5 md:py-1 rounded">
                       Sale
                     </div>
                   )}
                   
-                  {/* Heart Icon */}
                   <button
                     onClick={(e) => toggleWishlist(product._id, e)}
                     className="absolute top-2 right-2 md:top-3 md:right-3 bg-white rounded-full p-1 md:p-2 shadow-sm hover:shadow-md transition-all z-10"
@@ -258,13 +232,11 @@ const TrendingNow = () => {
                   </button>
                 </div>
 
-                {/* Product Info */}
                 <div className="p-4 bg-white">
                   <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem]">
                     {product.title || 'Untitled Product'}
                   </h3>
                   
-                  {/* Price Section */}
                   <div className="mb-2">
                     <div className="flex items-baseline gap-2 mb-1">
                       <div className="flex items-center">
@@ -291,7 +263,6 @@ const TrendingNow = () => {
           })}
         </div>
 
-        {/* Loading More Indicator */}
         {loadingMore && (
           <div className="flex justify-center items-center py-8">
             <FaSpinner className="animate-spin text-2xl text-pink-600" />
@@ -299,7 +270,6 @@ const TrendingNow = () => {
           </div>
         )}
 
-        {/* End of Products Message */}
         {!hasMore && displayedProducts.length > 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500 text-sm">You've seen all trending products!</p>

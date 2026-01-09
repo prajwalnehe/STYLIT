@@ -175,7 +175,6 @@ const Navbar = () => {
 
   // Navigation links matching suuupply style
   const navLinks = [
-    { name: 'all products', path: '/shop' },
     { name: 'tshirts', path: '/category/tshirts' },
     { name: 'Formal shirts', path: '/category/formal-shirts' },
     { name: 'pants', path: '/category/pants' },

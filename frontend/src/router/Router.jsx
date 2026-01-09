@@ -2,7 +2,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { CartProvider } from '../context/CartContext';
 import Layout from '../components/Layout';
 import Home from '../pages/Home';
-import Shop from '../pages/Shop';
 import About from '../pages/About';
 import Contact from '../pages/Contact';
 import SignIn from '../pages/SignIn';
@@ -95,7 +94,6 @@ const Router = () => {
         }>
           {/* Public routes */}
           <Route index element={<Home />} />
-          <Route path="shop" element={<Shop />} />
           {/* Saree Categories */}
           {/* Backwards-compatible static routes */}
           <Route path="category/banarasi" element={<CategoryList />} />

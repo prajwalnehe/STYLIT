@@ -73,7 +73,7 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
           setLoadedFromCache(true);
           setTimeout(() => setLoadedFromCache(false), 3000);
         } else {
-          setProducts([]);
+        setProducts([]);
         }
       } finally {
         setLoading(false);
@@ -168,15 +168,6 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
     return (
       <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Cache message */}
-          {loadedFromCache && (
-            <div className="mb-4 flex justify-center">
-              <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg text-sm animate-fade-in">
-                <FaSpinner className="text-green-600" />
-                <span>Loaded from cache</span>
-              </div>
-            </div>
-          )}
           {/* Grid Container - 2 rows, responsive columns */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
             {products.map((product) => (
@@ -227,7 +218,7 @@ const FeaturedProducts = ({ category = 'shirts', layout = 'scroll', maxProducts 
           {category !== 'perfumes' && category !== 'Shoes' && category !== 'shoes' && (
           <div className="flex justify-center mt-8 mb-4">
             <Link
-              to="/shop"
+              to="/"
               className="inline-block bg-black text-white px-8 py-3 rounded-lg font-semibold text-sm uppercase tracking-wide hover:bg-black-100 transition-all duration-300 transform hover:scale-105 shadow-lg border border-gray-300"
             >
               EXPLORE ALL LOOKS

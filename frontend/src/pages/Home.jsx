@@ -88,7 +88,7 @@ const Home = () => {
           <div className="relative z-10 text-center">
             <h2 className="text-3xl font-bold text-white mb-4">Top Picks & New Arrivals</h2>
             <Link
-              to="/shop"
+              to="/"
               className="inline-block bg-white text-black px-8 py-3 rounded-lg font-semibold text-sm uppercase tracking-wide hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
               EXPLORE ALL LOOKS

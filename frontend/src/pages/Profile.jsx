@@ -507,7 +507,7 @@ export default function Profile() {
                       <h3 className="text-xl font-bold text-gray-900 mb-2">No Orders Yet</h3>
                       <p className="text-gray-600 mb-6">You haven't placed any orders yet. Start shopping now!</p>
                       <button 
-                        onClick={() => navigate('/shop')} 
+                        onClick={() => navigate('/')} 
                         className="px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors shadow-sm"
                       >
                         Start Shopping
